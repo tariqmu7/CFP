@@ -1,0 +1,1130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carbon Footprint Quiz</title>
+    
+    <!-- Tailwind CSS (Styling) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- React & ReactDOM (Core Framework) -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    
+    <!-- Babel (To compile React code in browser) -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <!-- Custom Font (Optional, adds nice look) -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Inter', 'Cairo', sans-serif;
+        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #888; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555; 
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useMemo } = React;
+
+        // ----------------------------------------------------------------------
+        // ICONS (Inline SVGs to avoid external dependencies)
+        // ----------------------------------------------------------------------
+        
+        const Clock = ({ className }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+        );
+
+        const BookOpen = ({ className }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
+        );
+
+        const CheckCircle = ({ className }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+        );
+
+        const XCircle = ({ className }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>
+        );
+
+        const RefreshCw = ({ className }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M23 4v6h-6"></path><path d="M1 20v-6h6"></path><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+        );
+
+        // ----------------------------------------------------------------------
+        // DATA BANK
+        // ----------------------------------------------------------------------
+
+        const RAW_QUESTIONS = [
+          // --- PAGE 1: ARABIC GENERAL ---
+          {
+            id: 'ar-1',
+            lang: 'ar',
+            type: 'MCQ',
+            question: 'ما هو السبب الرئيسي لارتفاع درجة حرارة الأرض؟',
+            options: ['زيادة عدد البراكين', 'زيادة انبعاثات غازات الدفيئة', 'نقص كمية المياه العذبة', 'زيادة عدد الغابات'],
+            correctAnswer: 'زيادة انبعاثات غازات الدفيئة'
+          },
+          {
+            id: 'ar-2',
+            lang: 'ar',
+            type: 'MCQ',
+            question: 'أي من التالي ليس من آثار التغيرات المناخية؟',
+            options: ['ارتفاع مستوى سطح البحر', 'زيادة الأمطار الغزيرة', 'زيادة عدد الأيام المشمسة', 'زيادة تكرار الظواهر الجوية المتطرفة'],
+            correctAnswer: 'زيادة عدد الأيام المشمسة'
+          },
+          {
+            id: 'ar-3',
+            lang: 'ar',
+            type: 'MCQ',
+            question: 'ما هو بروتوكول كيوتو؟',
+            options: ['اتفاقية دولية تهدف إلى حماية طبقة الأوزون', 'اتفاقية دولية تهدف إلى خفض انبعاثات غازات الدفيئة', 'منظمة دولية تهتم بدراسة التنوع البيولوجي', 'منظمة دولية تهتم بتطوير مصادر الطاقة المتجددة'],
+            correctAnswer: 'اتفاقية دولية تهدف إلى خفض انبعاثات غازات الدفيئة'
+          },
+          {
+            id: 'ar-4',
+            lang: 'ar',
+            type: 'MCQ',
+            question: 'أي من الحلول التالية يمكن أن يساهم في الحد من التغيرات المناخية؟',
+            options: ['زيادة استخدام الوقود الأحفوري', 'زيادة قطع الأشجار', 'تطوير مصادر الطاقة المتجددة', 'زيادة الاعتماد على النقل الفردي بالسيارات'],
+            correctAnswer: 'تطوير مصادر الطاقة المتجددة'
+          },
+          {
+            id: 'ar-5',
+            lang: 'ar',
+            type: 'MCQ',
+            question: 'أي من الآتي يعتبر عامل تكثيف (amplifier) للتغيرات المناخية، حيث يزيد من تأثير الاحترار العالمي؟',
+            options: ['انخفاض مستوى الميثان في الغلاف الجوي', 'زيادة امتصاص المحيطات لحرارة الأرض', 'ذوبان الجليد البحري، مما يقلل من انعكاس أشعة الشمس', 'زيادة الغطاء النباتي في المناطق المعتدلة'],
+            correctAnswer: 'ذوبان الجليد البحري، مما يقلل من انعكاس أشعة الشمس'
+          },
+          {
+            id: 'ar-6',
+            lang: 'ar',
+            type: 'MCQ',
+            question: 'ما هو دور السحب العالية الرقيقة (cirrus clouds) في التغيرات المناخية؟',
+            options: ['تزيد من انعكاس أشعة الشمس', 'تعمل كبطانية تحبس الحرارة بالقرب من سطح الأرض', 'تساعد على تكوين الأمطار', 'لا تؤثر بشكل كبير على المناخ'],
+            correctAnswer: 'تعمل كبطانية تحبس الحرارة بالقرب من سطح الأرض'
+          },
+          // --- PAGE 2: ARABIC IMPACTS & ISO 14001 ---
+          {
+            id: 'ar-7',
+            lang: 'ar',
+            type: 'MCQ',
+            question: 'ما هو تأثير التغيرات المناخية على النظم الإيكولوجية؟',
+            options: ['تدهور النظم الإيكولوجية', 'تحسين النظم الإيكولوجية', 'لا تأثير', 'غير معروف'],
+            correctAnswer: 'تدهور النظم الإيكولوجية'
+          },
+          {
+            id: 'ar-8',
+            lang: 'ar',
+            type: 'MCQ',
+            question: 'كيف يتم تحسين تصميم المباني لتقليل الانبعاثات؟',
+            options: ['من خلال استخدام مواد بناء متجددة', 'من خلال تحسين التهوية', 'من خلال تصميم المباني الشمسية', 'جميع ما سبق'],
+            correctAnswer: 'جميع ما سبق'
+          },
+          {
+            id: 'ar-9',
+            lang: 'ar',
+            type: 'MCQ',
+            question: 'أي اتفاقية دولية تهدف إلى الحد من ظاهرة الاحتباس الحراري؟',
+            options: ['اتفاقية باريس', 'بروتوكول كيوتو', 'بروتوكول مونتريال', 'أ + ب (باريس وكيوتو)'],
+            correctAnswer: 'أ + ب (باريس وكيوتو)'
+          },
+          {
+            id: 'ar-10',
+            lang: 'ar',
+            type: 'MCQ',
+            question: 'ما هو تأثير التغيرات المناخية على الموارد الغذائية؟',
+            options: ['زيادة الإنتاج الغذائي', 'نقص الإنتاج الغذائي', 'لا تأثير', 'غير معروف'],
+            correctAnswer: 'نقص الإنتاج الغذائي'
+          },
+          {
+            id: 'ar-11',
+            lang: 'ar',
+            type: 'MCQ',
+            question: 'ISO 14001: ماذا يعني PDCA؟',
+            options: ['خطط، افعل، تحقق، تصرف', 'التخطيط، التنفيذ، التأكيد، التعديل', 'التحضير، التنفيذ، التحقق، التصرف', 'التحضير، التنفيذ، التأكيد، العمل'],
+            correctAnswer: 'خطط، افعل، تحقق، تصرف'
+          },
+          {
+            id: 'ar-12',
+            lang: 'ar',
+            type: 'MCQ',
+            question: 'ما هي الوثيقة التي تقدم إرشادات بشأن أنظمة إدارة التدقيق والمراجعة؟',
+            options: ['ISO 9000', 'ISO 9001', 'ISO 9002', 'ISO 19011'],
+            correctAnswer: 'ISO 19011'
+          },
+          {
+            id: 'ar-13',
+            lang: 'ar',
+            type: 'MCQ',
+            question: 'يتم تضمين تنفيذ أنظمة الإدارة البيئية في أي معيار؟',
+            options: ['ISO 14001', 'ISO 14002', 'ISO 14004', 'ISO 14006'],
+            correctAnswer: 'ISO 14001'
+          },
+          // --- PAGE 3: ISO 14001 & T/F ---
+          {
+            id: 'ar-14',
+            lang: 'ar',
+            type: 'MCQ',
+            question: 'النتيجة المقصودة من نظام الإدارة البيئية هي:',
+            options: ['تعزيز الأداء البيئي', 'الوفاء بالتزامات الامتثال', 'تحقيق الأهداف البيئية', 'كل ما سبق'],
+            correctAnswer: 'كل ما سبق'
+          },
+          {
+            id: 'ar-15',
+            lang: 'ar',
+            type: 'MCQ',
+            question: 'وفقاً للبند 9.2.1 في ISO 14001، متى يجب إجراء التدقيق الداخلي؟',
+            options: ['أسبوعياً', 'شهرياً', 'سنوياً', 'على فترات مخططة'],
+            correctAnswer: 'على فترات مخططة'
+          },
+          {
+            id: 'ar-tf-1',
+            lang: 'ar',
+            type: 'TF',
+            question: 'إن عملية تنفيذ نظام الإدارة البيئية يجب أن تكون طوعية بالكامل.',
+            options: ['صح', 'خطأ'],
+            correctAnswer: 'صح'
+          },
+          {
+            id: 'ar-tf-2',
+            lang: 'ar',
+            type: 'TF',
+            question: 'إن إدارة البيئة هي عملية دعم للقسم بأكمله، سواء في مجالات الإنتاج أو الإدارة.',
+            options: ['صح', 'خطأ'],
+            correctAnswer: 'صح'
+          },
+          {
+            id: 'ar-tf-3',
+            lang: 'ar',
+            type: 'TF',
+            question: 'من الفوائد الاقتصادية والاجتماعية لنظم الإدارة البيئية أنها تعطي مزايا في العطاءات والمناقصات.',
+            options: ['صح', 'خطأ'],
+            correctAnswer: 'صح'
+          },
+          
+          // --- PAGE 4: ISO 14064-1 ---
+          {
+            id: 'ar-16',
+            lang: 'ar',
+            type: 'MCQ',
+            question: 'ما هو الغرض الأساسي من المواصفة الدولية ISO 14064-1؟',
+            options: ['تقييم جودة المنتجات', 'تقييم الأداء المالي', 'تقييم انبعاثات الغازات الدفيئة', 'تقييم كفاءة الطاقة'],
+            correctAnswer: 'تقييم انبعاثات الغازات الدفيئة'
+          },
+          {
+            id: 'ar-17',
+            lang: 'ar',
+            type: 'MCQ',
+            question: 'أي من التالي يعتبر عنصراً أساسياً في نظام إدارة انبعاثات غازات الدفيئة وفقاً لـ ISO 14064-1؟',
+            options: ['تحديد الأهداف المالية', 'تحديد حدود النظام', 'تحسين جودة المنتج', 'زيادة الإنتاج'],
+            correctAnswer: 'تحديد حدود النظام'
+          },
+          {
+            id: 'ar-18',
+            lang: 'ar',
+            type: 'MCQ',
+            question: 'ما هي الاستراتيجية الرئيسية لتقليل انبعاثات غازات الاحتباس الحراري؟',
+            options: ['تحسين كفاءة الطاقة', 'استخدام الطاقة المتجددة', 'تقليل استهلاك المواد', 'جميع ما سبق'],
+            correctAnswer: 'جميع ما سبق'
+          },
+          {
+            id: 'ar-19',
+            lang: 'ar',
+            type: 'MCQ',
+            question: 'ما هي أهمية التحقق من البيانات في عملية تقييم الانبعاثات؟',
+            options: ['ضمان دقة النتائج', 'تقليل التكاليف', 'زيادة الإنتاجية', 'تحسين صورة الشركة'],
+            correctAnswer: 'ضمان دقة النتائج'
+          },
+          {
+            id: 'ar-20',
+            lang: 'ar',
+            type: 'MCQ',
+            question: 'ما هي المراحل الرئيسية في دورة حياة المنتج التي يجب أخذها في الاعتبار عند تقييم الانبعاثات؟',
+            options: ['الإنتاج والتوزيع فقط', 'الاستخراج، الإنتاج، التوزيع، الاستخدام، والتخلص', 'الإنتاج والاستخدام فقط', 'التوزيع والاستخدام فقط'],
+            correctAnswer: 'الاستخراج، الإنتاج، التوزيع، الاستخدام، والتخلص'
+          },
+          // --- PAGE 5: ISO 14064-1 T/F & MCQ ---
+          {
+            id: 'ar-21',
+            lang: 'ar',
+            type: 'MCQ',
+            question: 'أي من الغازات الدفيئة التالية له أقوى تأثير على الاحترار العالمي على المدى القصير؟',
+            options: ['ثاني أكسيد الكربون (CO2)', 'الميثان (CH4)', 'أكسيد النيتروز (N2O)', 'الفريونات (CFCs)'],
+            correctAnswer: 'الفريونات (CFCs)'
+          },
+          {
+            id: 'ar-tf-4',
+            lang: 'ar',
+            type: 'TF',
+            question: 'هل مواصفة ISO 14064-1 تتعلق بتحديد انبعاثات غازات الاحتباس الحراري؟',
+            options: ['صح', 'خطأ'],
+            correctAnswer: 'صح'
+          },
+          {
+            id: 'ar-tf-5',
+            lang: 'ar',
+            type: 'TF',
+            question: 'هل مواصفة ISO 14064-1 تهدف إلى تحسين كفاءة الطاقة فقط؟',
+            options: ['صح', 'خطأ'],
+            correctAnswer: 'خطأ'
+          },
+          {
+            id: 'ar-tf-6',
+            lang: 'ar',
+            type: 'TF',
+            question: 'هل يجب تحديد مصادر الانبعاثات حسب مواصفة ISO 14064-1؟',
+            options: ['صح', 'خطأ'],
+            correctAnswer: 'صح'
+          },
+          {
+            id: 'ar-tf-7',
+            lang: 'ar',
+            type: 'TF',
+            question: 'هل يجب تقديم تقرير عن الانبعاثات حسب مواصفة ISO 14064-1؟',
+            options: ['صح', 'خطأ'],
+            correctAnswer: 'صح'
+          },
+          // --- PAGE 6: ISO 14069 ---
+          {
+            id: 'ar-22',
+            lang: 'ar',
+            type: 'MCQ',
+            question: 'ISO 14069: ما هي العوامل التي يجب مراعاتها عند اختيار عوامل الانبعاث؟',
+            options: ['نوع الوقود المستخدم', 'تقنية الاحتراق', 'كفاءة الطاقة', 'كل ما سبق'],
+            correctAnswer: 'كل ما سبق'
+          },
+          {
+            id: 'ar-23',
+            lang: 'ar',
+            type: 'MCQ',
+            question: 'ما هو المصدر الرئيسي لانبعاثات ثاني أكسيد الكربون (CO2)؟',
+            options: ['استهلاك الوقود الأحفوري', 'إنتاج الطاقة الكهرومائية', 'إنتاج الأغذية العضوية', 'إعادة تدوير المياه'],
+            correctAnswer: 'استهلاك الوقود الأحفوري'
+          },
+          {
+            id: 'ar-24',
+            lang: 'ar',
+            type: 'MCQ',
+            question: 'ما هي الفئة الرئيسية لانبعاثات غازات الدفيئة للمنظمات (النطاق 1)؟',
+            options: ['الانبعاثات المباشرة', 'الانبعاثات غير المباشرة من الكهرباء', 'الانبعاثات غير المباشرة الأخرى', 'الانبعاثات العرضية'],
+            correctAnswer: 'الانبعاثات المباشرة'
+          },
+          {
+            id: 'ar-25',
+            lang: 'ar',
+            type: 'MCQ',
+            question: 'ما هي الأداة الرئيسية لقياس انبعاثات غازات الدفيئة للمنظمات؟',
+            options: ['نظام إدارة الطاقة', 'أداة حساب انبعاثات غازات الدفيئة (Calculator)', 'برنامج الموارد البشرية', 'نظام إدارة الجودة'],
+            correctAnswer: 'أداة حساب انبعاثات غازات الدفيئة (Calculator)'
+          },
+          // --- PAGE 7: ISO 14064-2 ---
+          {
+            id: 'ar-26',
+            lang: 'ar',
+            type: 'MCQ',
+            question: 'ما هو الهدف الرئيسي من تطبيق المواصفة ISO 14064-2؟',
+            options: ['تقليل تكاليف الشركات', 'تحسين الأداء البيئي من خلال قياس وتقليل الانبعاثات (المشاريع)', 'زيادة الإنتاجية', 'تحسين جودة المنتجات'],
+            correctAnswer: 'تحسين الأداء البيئي من خلال قياس وتقليل الانبعاثات (المشاريع)'
+          },
+          {
+            id: 'ar-27',
+            lang: 'ar',
+            type: 'MCQ',
+            question: 'كيف يمكن لصناعة الحديد والصلب استخدام المواصفة 14064 لخفض الانبعاثات؟',
+            options: ['تحسين كفاءة الفرن الكهربائي', 'زيادة التلوث', 'استخدام أساليب قديمة', 'زيادة استهلاك الطاقة'],
+            correctAnswer: 'تحسين كفاءة الفرن الكهربائي'
+          },
+          // --- PAGE 8: ISO 14064-2 T/F ---
+          {
+            id: 'ar-tf-8',
+            lang: 'ar',
+            type: 'TF',
+            question: 'يجب أن يشمل مشروع خفض انبعاثات الكربون توثيق وتحديد سنة الأساس.',
+            options: ['صح', 'خطأ'],
+            correctAnswer: 'صح'
+          },
+          {
+            id: 'ar-tf-9',
+            lang: 'ar',
+            type: 'TF',
+            question: 'تعد مراجعة البيانات جزءاً أساسياً من عملية إعداد تقرير الانبعاثات حسب ISO 14064-2.',
+            options: ['صح', 'خطأ'],
+            correctAnswer: 'صح'
+          },
+          {
+            id: 'ar-tf-10',
+            lang: 'ar',
+            type: 'TF',
+            question: 'يتعين على المشاريع تحديد حدود النظام بشكل دقيق لتحديد مصادر الانبعاثات.',
+            options: ['صح', 'خطأ'],
+            correctAnswer: 'صح'
+          },
+
+          // --- ENGLISH SECTION ---
+          // --- PAGE 9: ISO 50001 ---
+          {
+            id: 'en-1',
+            lang: 'en',
+            type: 'MCQ',
+            question: 'ISO 50001: What does energy management primarily focus on?',
+            options: ['Reducing costs in all departments', 'Systematic attention to energy to improve performance', 'Increasing the number of employees', 'Expanding product lines'],
+            correctAnswer: 'Systematic attention to energy to improve performance'
+          },
+          {
+            id: 'en-2',
+            lang: 'en',
+            type: 'MCQ',
+            question: 'What is the main objective of energy management?',
+            options: ['Increased energy costs', 'Enhanced operational efficiency and reduced environmental impact', 'Decreased employee productivity', 'Higher turnover rates'],
+            correctAnswer: 'Enhanced operational efficiency and reduced environmental impact'
+          },
+          {
+            id: 'en-3',
+            lang: 'en',
+            type: 'MCQ',
+            question: 'What does energy efficiency refer to?',
+            options: ['Total energy consumed', 'The relationship between output of performance and energy input', 'Cost of energy per unit', 'Number of employees'],
+            correctAnswer: 'The relationship between output of performance and energy input'
+          },
+          {
+            id: 'en-4',
+            lang: 'en',
+            type: 'MCQ',
+            question: 'What is a potential benefit of improving energy performance in an organization?',
+            options: ['Increased energy costs', 'Enhanced operational efficiency and reduced environmental impact', 'Decreased productivity', 'Higher turnover'],
+            correctAnswer: 'Enhanced operational efficiency and reduced environmental impact'
+          },
+          // --- PAGE 10: ISO 50001 Cont. & T/F ---
+          {
+            id: 'en-5',
+            lang: 'en',
+            type: 'MCQ',
+            question: 'What is the first key component in the energy management process?',
+            options: ['Analysis', 'Data Collection', 'Goal Setting', 'Implementation'],
+            correctAnswer: 'Data Collection' // Based on context "Plan" usually comes first, but Data Collection is often step 1 of Review.
+          },
+          {
+            id: 'en-tf-1',
+            lang: 'en',
+            type: 'TF',
+            question: 'Conducting an energy review is the first step in the energy management process.',
+            options: ['True', 'False'],
+            correctAnswer: 'True'
+          },
+          {
+            id: 'en-tf-2',
+            lang: 'en',
+            type: 'TF',
+            question: 'Identifying Significant Energy Uses (SEUs) is not necessary for establishing energy baselines.',
+            options: ['True', 'False'],
+            correctAnswer: 'False'
+          },
+          {
+            id: 'en-tf-3',
+            lang: 'en',
+            type: 'TF',
+            question: 'A relevant variable is a quantifiable factor that significantly impacts energy performance and routinely changes.',
+            options: ['True', 'False'],
+            correctAnswer: 'True'
+          },
+          // --- PAGE 11: LCA ---
+          {
+            id: 'en-6',
+            lang: 'en',
+            type: 'MCQ',
+            question: 'A Life cycle assessment should be done as a comparison of the _____ in different stages in the life cycle.',
+            options: ['Impact on the environment', 'Effect of pollution', 'Value judgment'],
+            correctAnswer: 'Impact on the environment'
+          },
+          {
+            id: 'en-7',
+            lang: 'en',
+            type: 'MCQ',
+            question: 'We can _____ the use of water, resources, energy sources and raw material for an LCA.',
+            options: ['Life cycle assessment', 'Evaluate', 'Calculate'],
+            correctAnswer: 'Evaluate'
+          },
+          {
+            id: 'en-8',
+            lang: 'en',
+            type: 'MCQ',
+            question: 'The EPD is independently _____ that communicates transparent environment life cycle impact of products in credible manner.',
+            options: ['First party', 'Second party', 'Third party'],
+            correctAnswer: 'Third party'
+          },
+          {
+            id: 'en-9',
+            lang: 'en',
+            type: 'MCQ',
+            question: 'Companies shall avoid allocation wherever possible by using:',
+            options: ['Process subdivision', 'Redefining the functional unit', 'Using system expansion', 'All of the above'],
+            correctAnswer: 'All of the above'
+          },
+          // --- PAGE 12: LCA T/F & ISO 14067 ---
+          {
+            id: 'en-tf-4',
+            lang: 'en',
+            type: 'TF',
+            question: 'The comparison between two different products with same function is accepted in LCA.',
+            options: ['True', 'False'],
+            correctAnswer: 'True'
+          },
+          {
+            id: 'en-tf-5',
+            lang: 'en',
+            type: 'TF',
+            question: 'The primary data is always site specific data.',
+            options: ['True', 'False'],
+            correctAnswer: 'True'
+          },
+          {
+            id: 'en-10',
+            lang: 'en',
+            type: 'MCQ',
+            question: 'What is the primary driver of climate change according to scientific consensus?',
+            options: ['Natural climate cycles', 'Human activities, particularly fossil fuel combustion', 'Solar radiation changes', 'Volcanic eruptions'],
+            correctAnswer: 'Human activities, particularly fossil fuel combustion'
+          },
+          {
+            id: 'en-11',
+            lang: 'en',
+            type: 'MCQ',
+            question: 'Which of the following is NOT a major greenhouse gas (GHG)?',
+            options: ['Carbon Dioxide (CO2)', 'Methane (CH4)', 'Nitrous Oxide (N2O)', 'Oxygen (O2)'],
+            correctAnswer: 'Oxygen (O2)'
+          },
+          // --- PAGE 13: ISO 14067 ---
+          {
+            id: 'en-12',
+            lang: 'en',
+            type: 'MCQ',
+            question: 'What does the term "carbon footprint" refer to?',
+            options: ['Amount of carbon in atmosphere', 'Total GHG emissions associated with an activity, product, or individual', 'Physical footprint of carbon fuel', 'Area of land for offsetting'],
+            correctAnswer: 'Total GHG emissions associated with an activity, product, or individual'
+          },
+          {
+            id: 'en-13',
+            lang: 'en',
+            type: 'MCQ',
+            question: 'What is the purpose of ISO 14067?',
+            options: ['To provide guidelines for carbon neutrality', 'To focus on the carbon footprint of products', 'To assess financial risks', 'To measure water usage'],
+            correctAnswer: 'To focus on the carbon footprint of products'
+          },
+          {
+            id: 'en-14',
+            lang: 'en',
+            type: 'MCQ',
+            question: 'Which scope of emissions includes direct GHG emissions from owned or controlled sources?',
+            options: ['Scope 1', 'Scope 2', 'Scope 3', 'Scope 4'],
+            correctAnswer: 'Scope 1'
+          },
+          // --- PAGE 14: T/F & GHG Protocol ---
+          {
+            id: 'en-tf-6',
+            lang: 'en',
+            type: 'TF',
+            question: 'Nitrous Oxide (N2O) is NOT a major greenhouse gas (GHG)?',
+            options: ['True', 'False'],
+            correctAnswer: 'False'
+          },
+          {
+            id: 'en-tf-7',
+            lang: 'en',
+            type: 'TF',
+            question: 'Life Cycle Assessment (LCA) evaluates the Environmental impacts of a product throughout its entire life cycle.',
+            options: ['True', 'False'],
+            correctAnswer: 'True'
+          },
+          {
+            id: 'en-15',
+            lang: 'en',
+            type: 'MCQ',
+            question: 'GHG Protocol: Global warming is caused by:',
+            options: ['Methane', 'Nitrogen dioxide', 'Greenhouse gases', 'Hydrogen'],
+            correctAnswer: 'Greenhouse gases'
+          },
+          {
+            id: 'en-16',
+            lang: 'en',
+            type: 'MCQ',
+            question: 'Green House Effect is due to:',
+            options: ['Ozone layer', 'Infrared layer', 'Moisture layer', 'CO2 layer in the atmosphere'],
+            correctAnswer: 'CO2 layer in the atmosphere'
+          },
+          // --- PAGE 15: GHG Protocol ---
+          {
+            id: 'en-17',
+            lang: 'en',
+            type: 'MCQ',
+            question: 'The GHG Protocol define and categorize emissions into the following:',
+            options: ['Direct Emissions', 'Indirect Emissions', 'Direct and Indirect Emissions', 'None of the above'],
+            correctAnswer: 'Direct and Indirect Emissions'
+          },
+          {
+            id: 'en-18',
+            lang: 'en',
+            type: 'MCQ',
+            question: 'GHG emissions typically occur from the following source categories:',
+            options: ['Stationary combustion and Fugitive', 'Mobile combustion, Process', 'Stationary, Mobile, Process and Fugitive', 'Stationary combustion only'],
+            correctAnswer: 'Stationary, Mobile, Process and Fugitive'
+          },
+          {
+            id: 'en-19',
+            lang: 'en',
+            type: 'MCQ',
+            question: 'The emission factor is:',
+            options: ['The factor that converts activity data into GHG emissions data', 'Value of collected data', 'Molecular weight', 'Equivalent weight'],
+            correctAnswer: 'The factor that converts activity data into GHG emissions data'
+          },
+          {
+            id: 'en-20',
+            lang: 'en',
+            type: 'MCQ',
+            question: 'The principles of GHG accounting are:',
+            options: ['Transparency and Accountability', 'Completeness and Consistency', 'Accuracy, Completeness and Consistency', 'Relevance, Completeness, Consistency, Transparency and Accuracy'],
+            correctAnswer: 'Relevance, Completeness, Consistency, Transparency and Accuracy'
+          },
+          // --- PAGE 16: T/F & IPCC ---
+          {
+            id: 'en-tf-8',
+            lang: 'en',
+            type: 'TF',
+            question: 'GHG Protocol defines 5 categories of scope 3 emissions.',
+            options: ['True', 'False'],
+            correctAnswer: 'False' // It defines 15 categories usually
+          },
+          {
+            id: 'en-tf-9',
+            lang: 'en',
+            type: 'TF',
+            question: 'Scope 3 emissions accounting is mandatory according to GHG Protocol.',
+            options: ['True', 'False'],
+            correctAnswer: 'False' // It is optional for the corporate standard
+          },
+          {
+            id: 'en-21',
+            lang: 'en',
+            type: 'MCQ',
+            question: 'IPCC: What is the primary emission source category for fugitive emissions in the petroleum sector?',
+            options: ['Combustion from flaring', 'Fugitive emissions from equipment leaks', 'Process emissions', 'Biomass combustion'],
+            correctAnswer: 'Fugitive emissions from equipment leaks'
+          },
+          {
+            id: 'en-22',
+            lang: 'en',
+            type: 'MCQ',
+            question: 'Why does the IPCC recommend tiered approaches for emission estimation?',
+            options: ['To match deadline', 'To balance accuracy with available data quality and resources', 'Simplify data', 'Avoid country-specific data'],
+            correctAnswer: 'To balance accuracy with available data quality and resources'
+          },
+          // --- PAGE 17: IPCC Cont. ---
+          {
+            id: 'en-23',
+            lang: 'en',
+            type: 'MCQ',
+            question: 'Which is NOT considered a Scope 1 emission under IPCC for a refinery?',
+            options: ['Combustion for process heat', 'Fugitive from pipelines', 'CO2 emissions from purchased electricity', 'Venting during maintenance'],
+            correctAnswer: 'CO2 emissions from purchased electricity' // Scope 2
+          },
+          {
+            id: 'en-24',
+            lang: 'en',
+            type: 'MCQ',
+            question: 'What is the default IPCC assumption about the oxidation factor for natural gas combustion?',
+            options: ['95%', '98%', '99%', '100%'],
+            correctAnswer: '100%'
+          },
+          {
+            id: 'en-25',
+            lang: 'en',
+            type: 'MCQ',
+            question: 'Why does the IPCC emphasize accounting for flaring efficiency?',
+            options: ['Eliminates methane', 'Inefficient flaring increases CO2', 'Inefficient flaring releases uncombusted methane', 'Promote energy recovery'],
+            correctAnswer: 'Inefficient flaring releases uncombusted methane'
+          },
+          // --- PAGE 18: IPCC T/F & CBAM ---
+          {
+            id: 'en-tf-10',
+            lang: 'en',
+            type: 'TF',
+            question: 'The IPCC directly conducts research and collects climate data from monitoring stations.',
+            options: ['True', 'False'],
+            correctAnswer: 'False' // It assesses research, doesn't conduct it
+          },
+          {
+            id: 'en-tf-11',
+            lang: 'en',
+            type: 'TF',
+            question: 'The IPCC is responsible for providing scientific reports on climate change to policymakers.',
+            options: ['True', 'False'],
+            correctAnswer: 'True'
+          },
+          {
+            id: 'en-26',
+            lang: 'en',
+            type: 'MCQ',
+            question: 'CBAM: CO2 emission calculations under CBAM account for steam inputs as part of:',
+            options: ['Scope 1', 'Scope 2', 'Not accounted for'],
+            correctAnswer: 'Scope 2' // Imported heat/steam is usually indirect
+          },
+          {
+            id: 'en-27',
+            lang: 'en',
+            type: 'MCQ',
+            question: 'If exported goods have embedded emissions higher than the free allowance:',
+            options: ['Penalties are imposed', 'CBAM certificates are bought from EU market', 'Certificates bought from Egyptian market'],
+            correctAnswer: 'CBAM certificates are bought from EU market'
+          },
+          // --- PAGE 19: CBAM T/F & ISO 14064-3 ---
+          {
+            id: 'en-tf-12',
+            lang: 'en',
+            type: 'TF',
+            question: 'Methane pyrolysis has a lower C footprint than Steam Methane Reforming.',
+            options: ['True', 'False'],
+            correctAnswer: 'True'
+          },
+          {
+            id: 'en-tf-13',
+            lang: 'en',
+            type: 'TF',
+            question: 'Green hydrogen is produced from water hydrolysis using grid electricity.',
+            options: ['True', 'False'],
+            correctAnswer: 'False' // Renewable electricity, not grid (unless grid is green)
+          },
+          {
+            id: 'en-28',
+            lang: 'en',
+            type: 'MCQ',
+            question: 'What is the primary objective of ISO 14064-3?',
+            options: ['Guidelines for quantification', 'Establish requirements for verification and validation', 'Certify inventories', 'Develop reduction projects'],
+            correctAnswer: 'Establish requirements for verification and validation'
+          },
+          // --- PAGE 20: ISO 14064-3 ---
+          {
+            id: 'en-29',
+            lang: 'en',
+            type: 'MCQ',
+            question: 'ISO 14064-3: What does the term "materiality" refer to?',
+            options: ['The threshold for significance of errors or omissions', 'Physical form of data', 'Type of inventory', 'Scope of assertion'],
+            correctAnswer: 'The threshold for significance of errors or omissions'
+          },
+          {
+            id: 'en-30',
+            lang: 'en',
+            type: 'MCQ',
+            question: 'Which is NOT a responsibility of the verifier under ISO 14064-3?',
+            options: ['Reviewing accuracy', 'Providing independent opinion', 'Assessing risk', 'Assisting the organization in preparing the GHG inventory'],
+            correctAnswer: 'Assisting the organization in preparing the GHG inventory' // Conflict of interest
+          },
+          {
+            id: 'en-31',
+            lang: 'en',
+            type: 'MCQ',
+            question: 'What is a key factor in determining the level of assurance?',
+            options: ['Size of team', 'Intended use of the GHG assertion', 'Duration of reporting', 'Type of protocol'],
+            correctAnswer: 'Intended use of the GHG assertion'
+          },
+          {
+            id: 'en-32',
+            lang: 'en',
+            type: 'MCQ',
+            question: 'What must a verifier provide at the conclusion of a verification process?',
+            options: ['Inventory report', 'Corrective action plan', 'Validation opinion', 'Assurance statement'],
+            correctAnswer: 'Assurance statement' // or Validation opinion, usually "Assurance statement" or "Verification opinion"
+          },
+          {
+            id: 'en-33',
+            lang: 'en',
+            type: 'MCQ',
+            question: 'Why is independence important for a verifier in ISO 14064-3?',
+            options: ['Compliance with regulations', 'Streamline process', 'Avoid conflicts of interest and ensure impartiality', 'Minimize evidence'],
+            correctAnswer: 'Avoid conflicts of interest and ensure impartiality'
+          },
+          // --- PAGE 21: ISO 14064-3 T/F ---
+          {
+            id: 'en-tf-14',
+            lang: 'en',
+            type: 'TF',
+            question: 'The verifier must be part of the team preparing GHG data to ensure accuracy.',
+            options: ['True', 'False'],
+            correctAnswer: 'False'
+          },
+          {
+            id: 'en-tf-15',
+            lang: 'en',
+            type: 'TF',
+            question: 'ISO 14064-3 focuses on ensuring the credibility of GHG data through verification and validation processes.',
+            options: ['True', 'False'],
+            correctAnswer: 'True'
+          },
+          {
+            id: 'en-tf-16',
+            lang: 'en',
+            type: 'TF',
+            question: 'The verifier can provide consulting services on emissions reductions during the verification process.',
+            options: ['True', 'False'],
+            correctAnswer: 'False'
+          },
+          {
+            id: 'en-tf-17',
+            lang: 'en',
+            type: 'TF',
+            question: 'Validation includes reviewing data related to emission sources and GHG sinks.',
+            options: ['True', 'False'],
+            correctAnswer: 'True'
+          }
+        ];
+
+        // ----------------------------------------------------------------------
+        // UTILS
+        // ----------------------------------------------------------------------
+
+        const shuffleArray = (array) => {
+          const arr = [...array];
+          for (let i = arr.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+          }
+          return arr;
+        };
+
+        const formatTime = (seconds) => {
+          const m = Math.floor(seconds / 60);
+          const s = seconds % 60;
+          return `${m}:${s < 10 ? '0' : ''}${s}`;
+        };
+
+        // ----------------------------------------------------------------------
+        // MAIN COMPONENT
+        // ----------------------------------------------------------------------
+
+        function CarbonFootprintQuiz() {
+          const [gameState, setGameState] = useState('welcome'); // welcome, quiz, result
+          const [quizQuestions, setQuizQuestions] = useState([]);
+          const [currentQIndex, setCurrentQIndex] = useState(0);
+          const [userAnswers, setUserAnswers] = useState({}); // { qId: { selected: string, isCorrect: bool } }
+          const [timeLeft, setTimeLeft] = useState(90 * 60); // 90 minutes in seconds
+
+          // Initialize Quiz
+          const startQuiz = () => {
+            const shuffled = shuffleArray(RAW_QUESTIONS);
+            // Simulate 80 questions by duplicating if list is short
+            let pool = [...shuffled];
+            while (pool.length < 80) {
+                pool = [...pool, ...shuffled];
+            }
+            const selected = pool.slice(0, 80).map((q, idx) => ({ ...q, tempId: `${q.id}-${idx}` })); 
+            
+            setQuizQuestions(selected);
+            setCurrentQIndex(0);
+            setUserAnswers({});
+            setTimeLeft(90 * 60);
+            setGameState('quiz');
+          };
+
+          // Timer
+          useEffect(() => {
+            let timer;
+            if (gameState === 'quiz' && timeLeft > 0) {
+              timer = setInterval(() => {
+                setTimeLeft((prev) => prev - 1);
+              }, 1000);
+            } else if (timeLeft === 0 && gameState === 'quiz') {
+              finishQuiz();
+            }
+            return () => clearInterval(timer);
+          }, [gameState, timeLeft]);
+
+          const handleAnswer = (option) => {
+            const currentQ = quizQuestions[currentQIndex];
+            if (userAnswers[currentQ.tempId]) return;
+
+            const isCorrect = option === currentQ.correctAnswer;
+            setUserAnswers((prev) => ({
+              ...prev,
+              [currentQ.tempId]: { selected: option, isCorrect }
+            }));
+          };
+
+          const nextQuestion = () => {
+            if (currentQIndex < quizQuestions.length - 1) {
+              setCurrentQIndex(prev => prev + 1);
+            }
+          };
+
+          const prevQuestion = () => {
+            if (currentQIndex > 0) {
+              setCurrentQIndex(prev => prev - 1);
+            }
+          };
+
+          const finishQuiz = () => {
+            setGameState('result');
+          };
+
+          const calculateScore = () => {
+            const total = quizQuestions.length;
+            const correct = Object.values(userAnswers).filter(a => a.isCorrect).length;
+            const percentage = (correct / total) * 100;
+            return { correct, total, percentage };
+          };
+
+          // Render Helpers
+          const currentQ = quizQuestions[currentQIndex];
+          const currentAnswerState = currentQ ? userAnswers[currentQ.tempId] : null;
+
+          return (
+            <div className="min-h-screen bg-gray-50 text-gray-800" dir="auto">
+              {/* HEADER */}
+              <header className="bg-emerald-700 text-white p-4 shadow-lg sticky top-0 z-10">
+                <div className="max-w-4xl mx-auto flex justify-between items-center">
+                  <div className="flex items-center space-x-3 rtl:space-x-reverse">
+                    <img 
+                      src="https://eprom.com.eg/wp-content/uploads/2025/02/epromwhite.png" 
+                      alt="EPROM Logo" 
+                      className="h-10 w-auto bg-white rounded p-1 object-contain" 
+                    />
+                    <h1 className="text-xl font-bold">Carbon Footprint Exam</h1>
+                  </div>
+                  {gameState === 'quiz' && (
+                    <div className={`flex items-center space-x-2 font-mono text-xl ${timeLeft < 300 ? 'text-red-300 animate-pulse' : ''}`}>
+                      <Clock className="w-5 h-5" />
+                      <span>{formatTime(timeLeft)}</span>
+                    </div>
+                  )}
+                </div>
+              </header>
+
+              {/* MAIN CONTENT */}
+              <main className="max-w-3xl mx-auto p-4 md:p-8">
+                
+                {/* WELCOME SCREEN */}
+                {gameState === 'welcome' && (
+                  <div className="bg-white rounded-xl shadow-md p-8 text-center space-y-6">
+                    <div className="flex justify-center mb-6">
+                      <img 
+                        src="https://eprom.com.eg/wp-content/uploads/2025/02/epromwhite.png" 
+                        alt="EPROM Logo" 
+                        className="h-28 w-auto object-contain" 
+                      />
+                    </div>
+                    <h2 className="text-3xl font-bold text-gray-800">اختبار البصمة الكربونية</h2>
+                    <p className="text-gray-600 text-lg">
+                      Carbon Footprint & ISO Standards Quiz
+                    </p>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-left rtl:text-right bg-gray-50 p-6 rounded-lg border border-gray-200">
+                      <div className="flex items-center space-x-3 rtl:space-x-reverse">
+                        <div className="bg-blue-100 p-2 rounded-lg text-blue-600 font-bold">80</div>
+                        <div>
+                          <p className="font-semibold">Questions</p>
+                          <p className="text-xs text-gray-500">Randomized</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center space-x-3 rtl:space-x-reverse">
+                        <div className="bg-orange-100 p-2 rounded-lg text-orange-600 font-bold">90</div>
+                        <div>
+                          <p className="font-semibold">Minutes</p>
+                          <p className="text-xs text-gray-500">Duration</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center space-x-3 rtl:space-x-reverse">
+                        <div className="bg-green-100 p-2 rounded-lg text-green-600 font-bold">70%</div>
+                        <div>
+                          <p className="font-semibold">Pass Score</p>
+                          <p className="text-xs text-gray-500">Required</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <ul className="text-sm text-gray-500 space-y-2 text-left rtl:text-right">
+                      <li>• Questions cover ISO 14064, 14001, 50001, GHG Protocol, IPCC, and LCA.</li>
+                      <li>• Immediate feedback: Green for Correct, Red for Incorrect.</li>
+                      <li>• Bilingual: Questions appear in their original language (Arabic/English).</li>
+                    </ul>
+
+                    <button 
+                      onClick={startQuiz}
+                      className="w-full py-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-bold text-xl transition shadow-lg flex items-center justify-center space-x-2"
+                    >
+                      <span>Start Exam / ابدأ الاختبار</span>
+                    </button>
+                  </div>
+                )}
+
+                {/* QUIZ SCREEN */}
+                {gameState === 'quiz' && currentQ && (
+                  <div className="space-y-6">
+                    {/* Progress Bar */}
+                    <div className="w-full bg-gray-200 rounded-full h-2.5">
+                      <div 
+                        className="bg-emerald-600 h-2.5 rounded-full transition-all duration-300" 
+                        style={{ width: `${((currentQIndex + 1) / quizQuestions.length) * 100}%` }}
+                      ></div>
+                    </div>
+
+                    <div className="flex justify-between text-sm text-gray-500 font-medium">
+                      <span>Question {currentQIndex + 1} of {quizQuestions.length}</span>
+                      <span className="uppercase tracking-wider">{currentQ.type} • {currentQ.lang === 'ar' ? 'Arabic' : 'English'}</span>
+                    </div>
+
+                    {/* Question Card */}
+                    <div className="bg-white rounded-xl shadow-md p-6 md:p-8 min-h-[300px] flex flex-col justify-between" dir={currentQ.lang === 'ar' ? 'rtl' : 'ltr'}>
+                      <div>
+                        <h3 className="text-xl md:text-2xl font-bold text-gray-800 mb-8 leading-relaxed">
+                          {currentQ.question}
+                        </h3>
+
+                        <div className="space-y-3">
+                          {currentQ.options.map((option, idx) => {
+                            // Determine styles based on answer state
+                            let btnClass = "w-full text-left rtl:text-right p-4 rounded-lg border-2 transition-all duration-200 font-medium text-lg flex justify-between items-center ";
+                            
+                            if (currentAnswerState) {
+                              if (option === currentQ.correctAnswer) {
+                                btnClass += "bg-green-100 border-green-500 text-green-800"; // Correct Answer
+                              } else if (currentAnswerState.selected === option && !currentAnswerState.isCorrect) {
+                                btnClass += "bg-red-100 border-red-500 text-red-800"; // Wrong Selection
+                              } else {
+                                btnClass += "bg-gray-50 border-gray-200 text-gray-400 opacity-60"; // Others
+                              }
+                            } else {
+                              btnClass += "bg-white border-gray-200 hover:border-emerald-500 hover:bg-emerald-50 text-gray-700";
+                            }
+
+                            return (
+                              <button
+                                key={idx}
+                                onClick={() => handleAnswer(option)}
+                                disabled={!!currentAnswerState}
+                                className={btnClass}
+                              >
+                                <span>{option}</span>
+                                {currentAnswerState && option === currentQ.correctAnswer && <CheckCircle className="w-6 h-6 text-green-600" />}
+                                {currentAnswerState && currentAnswerState.selected === option && option !== currentQ.correctAnswer && <XCircle className="w-6 h-6 text-red-600" />}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+
+                      {/* Note / Feedback */}
+                      {currentAnswerState && (
+                         <div className={`mt-6 p-4 rounded-lg ${currentAnswerState.isCorrect ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'}`}>
+                            <strong>{currentAnswerState.isCorrect ? 'Correct!' : 'Incorrect.'}</strong> 
+                            {!currentAnswerState.isCorrect && <span> The correct answer is: <strong>{currentQ.correctAnswer}</strong></span>}
+                         </div>
+                      )}
+                    </div>
+
+                    {/* Navigation */}
+                    <div className="flex justify-between items-center pt-4">
+                      <button 
+                        onClick={prevQuestion}
+                        disabled={currentQIndex === 0}
+                        className="px-6 py-2 text-gray-600 font-semibold disabled:opacity-30 hover:bg-gray-100 rounded-lg transition"
+                      >
+                        Previous
+                      </button>
+
+                      {currentQIndex === quizQuestions.length - 1 ? (
+                        <button 
+                          onClick={finishQuiz}
+                          className="px-8 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-bold shadow-md transition"
+                        >
+                          Submit Exam
+                        </button>
+                      ) : (
+                        <button 
+                          onClick={nextQuestion}
+                          className="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold shadow-md transition"
+                        >
+                          Next Question
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* RESULT SCREEN */}
+                {gameState === 'result' && (
+                  <div className="bg-white rounded-xl shadow-lg p-8 text-center space-y-8 animate-fade-in">
+                    <div className="space-y-2">
+                      <h2 className="text-3xl font-bold text-gray-800">Exam Completed</h2>
+                      <p className="text-gray-500">Here is your performance report</p>
+                    </div>
+
+                    {(() => {
+                      const { correct, total, percentage } = calculateScore();
+                      const isPassed = percentage >= 70;
+
+                      return (
+                        <div className="space-y-8">
+                          <div className={`w-40 h-40 mx-auto rounded-full flex flex-col items-center justify-center border-8 ${isPassed ? 'border-green-500 bg-green-50' : 'border-red-500 bg-red-50'}`}>
+                            <span className={`text-4xl font-bold ${isPassed ? 'text-green-600' : 'text-red-600'}`}>
+                              {Math.round(percentage)}%
+                            </span>
+                            <span className="text-sm text-gray-500 font-semibold">{isPassed ? 'PASSED' : 'FAILED'}</span>
+                          </div>
+
+                          <div className="grid grid-cols-2 gap-4 max-w-sm mx-auto">
+                            <div className="bg-gray-50 p-4 rounded-lg">
+                              <div className="text-2xl font-bold text-gray-800">{correct}</div>
+                              <div className="text-xs text-gray-500 uppercase tracking-wide">Correct</div>
+                            </div>
+                            <div className="bg-gray-50 p-4 rounded-lg">
+                              <div className="text-2xl font-bold text-gray-800">{total - correct}</div>
+                              <div className="text-xs text-gray-500 uppercase tracking-wide">Incorrect</div>
+                            </div>
+                          </div>
+
+                          <div className="p-4 rounded-lg bg-blue-50 text-blue-800 text-sm">
+                            {isPassed 
+                              ? "Congratulations! You have demonstrated a solid understanding of Carbon Footprint standards." 
+                              : "Don't give up! Review the ISO standards and try again to improve your score."}
+                          </div>
+
+                          <button 
+                            onClick={startQuiz}
+                            className="w-full md:w-auto px-10 py-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-bold text-lg shadow-lg flex items-center justify-center space-x-2 mx-auto transition"
+                          >
+                            <RefreshCw className="w-5 h-5" />
+                            <span>Retest (New Questions)</span>
+                          </button>
+                        </div>
+                      );
+                    })()}
+                  </div>
+                )}
+
+              </main>
+            </div>
+          );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<CarbonFootprintQuiz />);
+    </script>
+</body>
+</html>
