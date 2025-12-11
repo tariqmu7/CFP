@@ -46,7 +46,7 @@
         const { useState, useEffect, useMemo } = React;
 
         // ----------------------------------------------------------------------
-        // ICONS (Inline SVGs to avoid external dependencies)
+        // ICONS
         // ----------------------------------------------------------------------
         
         const Clock = ({ className }) => (
@@ -69,732 +69,252 @@
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M23 4v6h-6"></path><path d="M1 20v-6h6"></path><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
         );
 
+        const Layers = ({ className }) => (
+             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+        );
+
         // ----------------------------------------------------------------------
-        // DATA BANK
+        // COMPLETE DATA BANK (Extracted from PDF)
         // ----------------------------------------------------------------------
 
         const RAW_QUESTIONS = [
           // --- PAGE 1: ARABIC GENERAL ---
-          {
-            id: 'ar-1',
-            lang: 'ar',
-            type: 'MCQ',
-            question: 'ما هو السبب الرئيسي لارتفاع درجة حرارة الأرض؟',
-            options: ['زيادة عدد البراكين', 'زيادة انبعاثات غازات الدفيئة', 'نقص كمية المياه العذبة', 'زيادة عدد الغابات'],
-            correctAnswer: 'زيادة انبعاثات غازات الدفيئة'
-          },
-          {
-            id: 'ar-2',
-            lang: 'ar',
-            type: 'MCQ',
-            question: 'أي من التالي ليس من آثار التغيرات المناخية؟',
-            options: ['ارتفاع مستوى سطح البحر', 'زيادة الأمطار الغزيرة', 'زيادة عدد الأيام المشمسة', 'زيادة تكرار الظواهر الجوية المتطرفة'],
-            correctAnswer: 'زيادة عدد الأيام المشمسة'
-          },
-          {
-            id: 'ar-3',
-            lang: 'ar',
-            type: 'MCQ',
-            question: 'ما هو بروتوكول كيوتو؟',
-            options: ['اتفاقية دولية تهدف إلى حماية طبقة الأوزون', 'اتفاقية دولية تهدف إلى خفض انبعاثات غازات الدفيئة', 'منظمة دولية تهتم بدراسة التنوع البيولوجي', 'منظمة دولية تهتم بتطوير مصادر الطاقة المتجددة'],
-            correctAnswer: 'اتفاقية دولية تهدف إلى خفض انبعاثات غازات الدفيئة'
-          },
-          {
-            id: 'ar-4',
-            lang: 'ar',
-            type: 'MCQ',
-            question: 'أي من الحلول التالية يمكن أن يساهم في الحد من التغيرات المناخية؟',
-            options: ['زيادة استخدام الوقود الأحفوري', 'زيادة قطع الأشجار', 'تطوير مصادر الطاقة المتجددة', 'زيادة الاعتماد على النقل الفردي بالسيارات'],
-            correctAnswer: 'تطوير مصادر الطاقة المتجددة'
-          },
-          {
-            id: 'ar-5',
-            lang: 'ar',
-            type: 'MCQ',
-            question: 'أي من الآتي يعتبر عامل تكثيف (amplifier) للتغيرات المناخية، حيث يزيد من تأثير الاحترار العالمي؟',
-            options: ['انخفاض مستوى الميثان في الغلاف الجوي', 'زيادة امتصاص المحيطات لحرارة الأرض', 'ذوبان الجليد البحري، مما يقلل من انعكاس أشعة الشمس', 'زيادة الغطاء النباتي في المناطق المعتدلة'],
-            correctAnswer: 'ذوبان الجليد البحري، مما يقلل من انعكاس أشعة الشمس'
-          },
-          {
-            id: 'ar-6',
-            lang: 'ar',
-            type: 'MCQ',
-            question: 'ما هو دور السحب العالية الرقيقة (cirrus clouds) في التغيرات المناخية؟',
-            options: ['تزيد من انعكاس أشعة الشمس', 'تعمل كبطانية تحبس الحرارة بالقرب من سطح الأرض', 'تساعد على تكوين الأمطار', 'لا تؤثر بشكل كبير على المناخ'],
-            correctAnswer: 'تعمل كبطانية تحبس الحرارة بالقرب من سطح الأرض'
-          },
-          // --- PAGE 2: ARABIC IMPACTS & ISO 14001 ---
-          {
-            id: 'ar-7',
-            lang: 'ar',
-            type: 'MCQ',
-            question: 'ما هو تأثير التغيرات المناخية على النظم الإيكولوجية؟',
-            options: ['تدهور النظم الإيكولوجية', 'تحسين النظم الإيكولوجية', 'لا تأثير', 'غير معروف'],
-            correctAnswer: 'تدهور النظم الإيكولوجية'
-          },
-          {
-            id: 'ar-8',
-            lang: 'ar',
-            type: 'MCQ',
-            question: 'كيف يتم تحسين تصميم المباني لتقليل الانبعاثات؟',
-            options: ['من خلال استخدام مواد بناء متجددة', 'من خلال تحسين التهوية', 'من خلال تصميم المباني الشمسية', 'جميع ما سبق'],
-            correctAnswer: 'جميع ما سبق'
-          },
-          {
-            id: 'ar-9',
-            lang: 'ar',
-            type: 'MCQ',
-            question: 'أي اتفاقية دولية تهدف إلى الحد من ظاهرة الاحتباس الحراري؟',
-            options: ['اتفاقية باريس', 'بروتوكول كيوتو', 'بروتوكول مونتريال', 'أ + ب (باريس وكيوتو)'],
-            correctAnswer: 'أ + ب (باريس وكيوتو)'
-          },
-          {
-            id: 'ar-10',
-            lang: 'ar',
-            type: 'MCQ',
-            question: 'ما هو تأثير التغيرات المناخية على الموارد الغذائية؟',
-            options: ['زيادة الإنتاج الغذائي', 'نقص الإنتاج الغذائي', 'لا تأثير', 'غير معروف'],
-            correctAnswer: 'نقص الإنتاج الغذائي'
-          },
-          {
-            id: 'ar-11',
-            lang: 'ar',
-            type: 'MCQ',
-            question: 'ISO 14001: ماذا يعني PDCA؟',
-            options: ['خطط، افعل، تحقق، تصرف', 'التخطيط، التنفيذ، التأكيد، التعديل', 'التحضير، التنفيذ، التحقق، التصرف', 'التحضير، التنفيذ، التأكيد، العمل'],
-            correctAnswer: 'خطط، افعل، تحقق، تصرف'
-          },
-          {
-            id: 'ar-12',
-            lang: 'ar',
-            type: 'MCQ',
-            question: 'ما هي الوثيقة التي تقدم إرشادات بشأن أنظمة إدارة التدقيق والمراجعة؟',
-            options: ['ISO 9000', 'ISO 9001', 'ISO 9002', 'ISO 19011'],
-            correctAnswer: 'ISO 19011'
-          },
-          {
-            id: 'ar-13',
-            lang: 'ar',
-            type: 'MCQ',
-            question: 'يتم تضمين تنفيذ أنظمة الإدارة البيئية في أي معيار؟',
-            options: ['ISO 14001', 'ISO 14002', 'ISO 14004', 'ISO 14006'],
-            correctAnswer: 'ISO 14001'
-          },
-          // --- PAGE 3: ISO 14001 & T/F ---
-          {
-            id: 'ar-14',
-            lang: 'ar',
-            type: 'MCQ',
-            question: 'النتيجة المقصودة من نظام الإدارة البيئية هي:',
-            options: ['تعزيز الأداء البيئي', 'الوفاء بالتزامات الامتثال', 'تحقيق الأهداف البيئية', 'كل ما سبق'],
-            correctAnswer: 'كل ما سبق'
-          },
-          {
-            id: 'ar-15',
-            lang: 'ar',
-            type: 'MCQ',
-            question: 'وفقاً للبند 9.2.1 في ISO 14001، متى يجب إجراء التدقيق الداخلي؟',
-            options: ['أسبوعياً', 'شهرياً', 'سنوياً', 'على فترات مخططة'],
-            correctAnswer: 'على فترات مخططة'
-          },
-          {
-            id: 'ar-tf-1',
-            lang: 'ar',
-            type: 'TF',
-            question: 'إن عملية تنفيذ نظام الإدارة البيئية يجب أن تكون طوعية بالكامل.',
-            options: ['صح', 'خطأ'],
-            correctAnswer: 'صح'
-          },
-          {
-            id: 'ar-tf-2',
-            lang: 'ar',
-            type: 'TF',
-            question: 'إن إدارة البيئة هي عملية دعم للقسم بأكمله، سواء في مجالات الإنتاج أو الإدارة.',
-            options: ['صح', 'خطأ'],
-            correctAnswer: 'صح'
-          },
-          {
-            id: 'ar-tf-3',
-            lang: 'ar',
-            type: 'TF',
-            question: 'من الفوائد الاقتصادية والاجتماعية لنظم الإدارة البيئية أنها تعطي مزايا في العطاءات والمناقصات.',
-            options: ['صح', 'خطأ'],
-            correctAnswer: 'صح'
-          },
-          
-          // --- PAGE 4: ISO 14064-1 ---
-          {
-            id: 'ar-16',
-            lang: 'ar',
-            type: 'MCQ',
-            question: 'ما هو الغرض الأساسي من المواصفة الدولية ISO 14064-1؟',
-            options: ['تقييم جودة المنتجات', 'تقييم الأداء المالي', 'تقييم انبعاثات الغازات الدفيئة', 'تقييم كفاءة الطاقة'],
-            correctAnswer: 'تقييم انبعاثات الغازات الدفيئة'
-          },
-          {
-            id: 'ar-17',
-            lang: 'ar',
-            type: 'MCQ',
-            question: 'أي من التالي يعتبر عنصراً أساسياً في نظام إدارة انبعاثات غازات الدفيئة وفقاً لـ ISO 14064-1؟',
-            options: ['تحديد الأهداف المالية', 'تحديد حدود النظام', 'تحسين جودة المنتج', 'زيادة الإنتاج'],
-            correctAnswer: 'تحديد حدود النظام'
-          },
-          {
-            id: 'ar-18',
-            lang: 'ar',
-            type: 'MCQ',
-            question: 'ما هي الاستراتيجية الرئيسية لتقليل انبعاثات غازات الاحتباس الحراري؟',
-            options: ['تحسين كفاءة الطاقة', 'استخدام الطاقة المتجددة', 'تقليل استهلاك المواد', 'جميع ما سبق'],
-            correctAnswer: 'جميع ما سبق'
-          },
-          {
-            id: 'ar-19',
-            lang: 'ar',
-            type: 'MCQ',
-            question: 'ما هي أهمية التحقق من البيانات في عملية تقييم الانبعاثات؟',
-            options: ['ضمان دقة النتائج', 'تقليل التكاليف', 'زيادة الإنتاجية', 'تحسين صورة الشركة'],
-            correctAnswer: 'ضمان دقة النتائج'
-          },
-          {
-            id: 'ar-20',
-            lang: 'ar',
-            type: 'MCQ',
-            question: 'ما هي المراحل الرئيسية في دورة حياة المنتج التي يجب أخذها في الاعتبار عند تقييم الانبعاثات؟',
-            options: ['الإنتاج والتوزيع فقط', 'الاستخراج، الإنتاج، التوزيع، الاستخدام، والتخلص', 'الإنتاج والاستخدام فقط', 'التوزيع والاستخدام فقط'],
-            correctAnswer: 'الاستخراج، الإنتاج، التوزيع، الاستخدام، والتخلص'
-          },
-          // --- PAGE 5: ISO 14064-1 T/F & MCQ ---
-          {
-            id: 'ar-21',
-            lang: 'ar',
-            type: 'MCQ',
-            question: 'أي من الغازات الدفيئة التالية له أقوى تأثير على الاحترار العالمي على المدى القصير؟',
-            options: ['ثاني أكسيد الكربون (CO2)', 'الميثان (CH4)', 'أكسيد النيتروز (N2O)', 'الفريونات (CFCs)'],
-            correctAnswer: 'الفريونات (CFCs)'
-          },
-          {
-            id: 'ar-tf-4',
-            lang: 'ar',
-            type: 'TF',
-            question: 'هل مواصفة ISO 14064-1 تتعلق بتحديد انبعاثات غازات الاحتباس الحراري؟',
-            options: ['صح', 'خطأ'],
-            correctAnswer: 'صح'
-          },
-          {
-            id: 'ar-tf-5',
-            lang: 'ar',
-            type: 'TF',
-            question: 'هل مواصفة ISO 14064-1 تهدف إلى تحسين كفاءة الطاقة فقط؟',
-            options: ['صح', 'خطأ'],
-            correctAnswer: 'خطأ'
-          },
-          {
-            id: 'ar-tf-6',
-            lang: 'ar',
-            type: 'TF',
-            question: 'هل يجب تحديد مصادر الانبعاثات حسب مواصفة ISO 14064-1؟',
-            options: ['صح', 'خطأ'],
-            correctAnswer: 'صح'
-          },
-          {
-            id: 'ar-tf-7',
-            lang: 'ar',
-            type: 'TF',
-            question: 'هل يجب تقديم تقرير عن الانبعاثات حسب مواصفة ISO 14064-1؟',
-            options: ['صح', 'خطأ'],
-            correctAnswer: 'صح'
-          },
-          // --- PAGE 6: ISO 14069 ---
-          {
-            id: 'ar-22',
-            lang: 'ar',
-            type: 'MCQ',
-            question: 'ISO 14069: ما هي العوامل التي يجب مراعاتها عند اختيار عوامل الانبعاث؟',
-            options: ['نوع الوقود المستخدم', 'تقنية الاحتراق', 'كفاءة الطاقة', 'كل ما سبق'],
-            correctAnswer: 'كل ما سبق'
-          },
-          {
-            id: 'ar-23',
-            lang: 'ar',
-            type: 'MCQ',
-            question: 'ما هو المصدر الرئيسي لانبعاثات ثاني أكسيد الكربون (CO2)؟',
-            options: ['استهلاك الوقود الأحفوري', 'إنتاج الطاقة الكهرومائية', 'إنتاج الأغذية العضوية', 'إعادة تدوير المياه'],
-            correctAnswer: 'استهلاك الوقود الأحفوري'
-          },
-          {
-            id: 'ar-24',
-            lang: 'ar',
-            type: 'MCQ',
-            question: 'ما هي الفئة الرئيسية لانبعاثات غازات الدفيئة للمنظمات (النطاق 1)؟',
-            options: ['الانبعاثات المباشرة', 'الانبعاثات غير المباشرة من الكهرباء', 'الانبعاثات غير المباشرة الأخرى', 'الانبعاثات العرضية'],
-            correctAnswer: 'الانبعاثات المباشرة'
-          },
-          {
-            id: 'ar-25',
-            lang: 'ar',
-            type: 'MCQ',
-            question: 'ما هي الأداة الرئيسية لقياس انبعاثات غازات الدفيئة للمنظمات؟',
-            options: ['نظام إدارة الطاقة', 'أداة حساب انبعاثات غازات الدفيئة (Calculator)', 'برنامج الموارد البشرية', 'نظام إدارة الجودة'],
-            correctAnswer: 'أداة حساب انبعاثات غازات الدفيئة (Calculator)'
-          },
-          // --- PAGE 7: ISO 14064-2 ---
-          {
-            id: 'ar-26',
-            lang: 'ar',
-            type: 'MCQ',
-            question: 'ما هو الهدف الرئيسي من تطبيق المواصفة ISO 14064-2؟',
-            options: ['تقليل تكاليف الشركات', 'تحسين الأداء البيئي من خلال قياس وتقليل الانبعاثات (المشاريع)', 'زيادة الإنتاجية', 'تحسين جودة المنتجات'],
-            correctAnswer: 'تحسين الأداء البيئي من خلال قياس وتقليل الانبعاثات (المشاريع)'
-          },
-          {
-            id: 'ar-27',
-            lang: 'ar',
-            type: 'MCQ',
-            question: 'كيف يمكن لصناعة الحديد والصلب استخدام المواصفة 14064 لخفض الانبعاثات؟',
-            options: ['تحسين كفاءة الفرن الكهربائي', 'زيادة التلوث', 'استخدام أساليب قديمة', 'زيادة استهلاك الطاقة'],
-            correctAnswer: 'تحسين كفاءة الفرن الكهربائي'
-          },
-          // --- PAGE 8: ISO 14064-2 T/F ---
-          {
-            id: 'ar-tf-8',
-            lang: 'ar',
-            type: 'TF',
-            question: 'يجب أن يشمل مشروع خفض انبعاثات الكربون توثيق وتحديد سنة الأساس.',
-            options: ['صح', 'خطأ'],
-            correctAnswer: 'صح'
-          },
-          {
-            id: 'ar-tf-9',
-            lang: 'ar',
-            type: 'TF',
-            question: 'تعد مراجعة البيانات جزءاً أساسياً من عملية إعداد تقرير الانبعاثات حسب ISO 14064-2.',
-            options: ['صح', 'خطأ'],
-            correctAnswer: 'صح'
-          },
-          {
-            id: 'ar-tf-10',
-            lang: 'ar',
-            type: 'TF',
-            question: 'يتعين على المشاريع تحديد حدود النظام بشكل دقيق لتحديد مصادر الانبعاثات.',
-            options: ['صح', 'خطأ'],
-            correctAnswer: 'صح'
-          },
+          { id: 'ar-1', lang: 'ar', type: 'MCQ', question: 'ما هو السبب الرئيسي لارتفاع درجة حرارة الأرض؟', options: ['زيادة عدد البراكين', 'زيادة انبعاثات غازات الدفيئة', 'نقص كمية المياه العذبة', 'زيادة عدد الغابات'], correctAnswer: 'زيادة انبعاثات غازات الدفيئة' },
+          { id: 'ar-2', lang: 'ar', type: 'MCQ', question: 'أي من التالي ليس من آثار التغيرات المناخية؟', options: ['ارتفاع مستوى سطح البحر', 'زيادة الأمطار الغزيرة', 'زيادة عدد الأيام المشمسة', 'زيادة تكرار الظواهر الجوية المتطرفة'], correctAnswer: 'زيادة عدد الأيام المشمسة' },
+          { id: 'ar-3', lang: 'ar', type: 'MCQ', question: 'ما هو بروتوكول كيوتو؟', options: ['اتفاقية دولية تهدف إلى حماية طبقة الأوزون', 'اتفاقية دولية تهدف إلى خفض انبعاثات غازات الدفيئة', 'منظمة دولية تهتم بدراسة التنوع البيولوجي', 'منظمة دولية تهتم بتطوير مصادر الطاقة المتجددة'], correctAnswer: 'اتفاقية دولية تهدف إلى خفض انبعاثات غازات الدفيئة' },
+          { id: 'ar-4', lang: 'ar', type: 'MCQ', question: 'أي من الحلول التالية يمكن أن يساهم في الحد من التغيرات المناخية؟', options: ['زيادة استخدام الوقود الأحفوري', 'زيادة قطع الأشجار', 'تطوير مصادر الطاقة المتجددة', 'زيادة الاعتماد على النقل الفردي بالسيارات'], correctAnswer: 'تطوير مصادر الطاقة المتجددة' },
+          { id: 'ar-5', lang: 'ar', type: 'MCQ', question: 'أي من الآتي يعتبر عامل تكثيف (amplifier) للتغيرات المناخية، حيث يزيد من تأثير الاحترار العالمي؟', options: ['انخفاض مستوى الميثان في الغلاف الجوي', 'زيادة امتصاص المحيطات لحرارة الأرض', 'ذوبان الجليد البحري، مما يقلل من انعكاس أشعة الشمس', 'زيادة الغطاء النباتي في المناطق المعتدلة'], correctAnswer: 'ذوبان الجليد البحري، مما يقلل من انعكاس أشعة الشمس' },
+          { id: 'ar-6', lang: 'ar', type: 'MCQ', question: 'ما هو دور السحب العالية الرقيقة (cirrus clouds) في التغيرات المناخية؟', options: ['تزيد من انعكاس أشعة الشمس', 'تعمل كبطانية تحبس الحرارة بالقرب من سطح الأرض', 'تساعد على تكوين الأمطار', 'لا تؤثر بشكل كبير على المناخ'], correctAnswer: 'تعمل كبطانية تحبس الحرارة بالقرب من سطح الأرض' },
 
-          // --- ENGLISH SECTION ---
-          // --- PAGE 9: ISO 50001 ---
-          {
-            id: 'en-1',
-            lang: 'en',
-            type: 'MCQ',
-            question: 'ISO 50001: What does energy management primarily focus on?',
-            options: ['Reducing costs in all departments', 'Systematic attention to energy to improve performance', 'Increasing the number of employees', 'Expanding product lines'],
-            correctAnswer: 'Systematic attention to energy to improve performance'
-          },
-          {
-            id: 'en-2',
-            lang: 'en',
-            type: 'MCQ',
-            question: 'What is the main objective of energy management?',
-            options: ['Increased energy costs', 'Enhanced operational efficiency and reduced environmental impact', 'Decreased employee productivity', 'Higher turnover rates'],
-            correctAnswer: 'Enhanced operational efficiency and reduced environmental impact'
-          },
-          {
-            id: 'en-3',
-            lang: 'en',
-            type: 'MCQ',
-            question: 'What does energy efficiency refer to?',
-            options: ['Total energy consumed', 'The relationship between output of performance and energy input', 'Cost of energy per unit', 'Number of employees'],
-            correctAnswer: 'The relationship between output of performance and energy input'
-          },
-          {
-            id: 'en-4',
-            lang: 'en',
-            type: 'MCQ',
-            question: 'What is a potential benefit of improving energy performance in an organization?',
-            options: ['Increased energy costs', 'Enhanced operational efficiency and reduced environmental impact', 'Decreased productivity', 'Higher turnover'],
-            correctAnswer: 'Enhanced operational efficiency and reduced environmental impact'
-          },
-          // --- PAGE 10: ISO 50001 Cont. & T/F ---
-          {
-            id: 'en-5',
-            lang: 'en',
-            type: 'MCQ',
-            question: 'What is the first key component in the energy management process?',
-            options: ['Analysis', 'Data Collection', 'Goal Setting', 'Implementation'],
-            correctAnswer: 'Data Collection' // Based on context "Plan" usually comes first, but Data Collection is often step 1 of Review.
-          },
-          {
-            id: 'en-tf-1',
-            lang: 'en',
-            type: 'TF',
-            question: 'Conducting an energy review is the first step in the energy management process.',
-            options: ['True', 'False'],
-            correctAnswer: 'True'
-          },
-          {
-            id: 'en-tf-2',
-            lang: 'en',
-            type: 'TF',
-            question: 'Identifying Significant Energy Uses (SEUs) is not necessary for establishing energy baselines.',
-            options: ['True', 'False'],
-            correctAnswer: 'False'
-          },
-          {
-            id: 'en-tf-3',
-            lang: 'en',
-            type: 'TF',
-            question: 'A relevant variable is a quantifiable factor that significantly impacts energy performance and routinely changes.',
-            options: ['True', 'False'],
-            correctAnswer: 'True'
-          },
+          // --- PAGE 2: IMPACTS & ISO 14001 ---
+          { id: 'ar-7', lang: 'ar', type: 'MCQ', question: 'ما هو تأثير التغيرات المناخية على النظم الإيكولوجية؟', options: ['تدهور النظم الإيكولوجية', 'تحسين النظم الإيكولوجية', 'لا تأثير', 'غير معروف'], correctAnswer: 'تدهور النظم الإيكولوجية' },
+          { id: 'ar-8', lang: 'ar', type: 'MCQ', question: 'كيف يتم تحسين تصميم المباني لتقليل الانبعاثات؟', options: ['من خلال استخدام مواد بناء متجددة', 'من خلال تحسين التهوية', 'من خلال تصميم المباني الشمسية', 'جميع ما سبق'], correctAnswer: 'جميع ما سبق' },
+          { id: 'ar-9', lang: 'ar', type: 'MCQ', question: 'أي اتفاقية دولية تهدف إلى الحد من ظاهرة الاحتباس الحراري؟', options: ['اتفاقية باريس', 'بروتوكول كيوتو', 'بروتوكول مونتريال', 'أ + ب (باريس وكيوتو)'], correctAnswer: 'أ + ب (باريس وكيوتو)' },
+          { id: 'ar-10', lang: 'ar', type: 'MCQ', question: 'ما هو تأثير التغيرات المناخية على الموارد الغذائية؟', options: ['زيادة الإنتاج الغذائي', 'نقص الإنتاج الغذائي', 'لا تأثير', 'غير معروف'], correctAnswer: 'نقص الإنتاج الغذائي' },
+          { id: 'ar-11', lang: 'ar', type: 'MCQ', question: 'ISO 14001: ماذا يعني PDCA؟', options: ['خطط، افعل، تحقق، تصرف', 'التخطيط، التنفيذ، التأكيد، التعديل', 'التحضير، التنفيذ، التحقق، التصرف', 'التحضير، التنفيذ، التأكيد، العمل'], correctAnswer: 'خطط، افعل، تحقق، تصرف' },
+          { id: 'ar-12', lang: 'ar', type: 'MCQ', question: 'ما هي الوثيقة التي تقدم إرشادات بشأن أنظمة إدارة التدقيق والمراجعة؟', options: ['ISO 9000', 'ISO 9001', 'ISO 9002', 'ISO 19011'], correctAnswer: 'ISO 19011' },
+          { id: 'ar-13', lang: 'ar', type: 'MCQ', question: 'يتم تضمين تنفيذ أنظمة الإدارة البيئية في أي معيار؟', options: ['ISO 14001', 'ISO 14002', 'ISO 14004', 'ISO 14006'], correctAnswer: 'ISO 14001' },
+
+          // --- PAGE 3: ISO 14001 ---
+          { id: 'ar-14', lang: 'ar', type: 'MCQ', question: 'النتيجة المقصودة من نظام الإدارة البيئية هي:', options: ['تعزيز الأداء البيئي', 'الوفاء بالتزامات الامتثال', 'تحقيق الأهداف البيئية', 'كل ما سبق'], correctAnswer: 'كل ما سبق' },
+          { id: 'ar-15', lang: 'ar', type: 'MCQ', question: 'يمثل نظام الإدارة مجموعة من العمليات والممارسات التي تمكن منظمة من تقليل تأثيرها البيئي وزيادة كفاءتها:', options: ['نظم إدارة البيئة', 'الفوائد الاقتصادية والاجتماعية', 'شروط خاصة', 'تأثير أصحاب المصلحة'], correctAnswer: 'نظم إدارة البيئة' },
+          { id: 'ar-16', lang: 'ar', type: 'MCQ', question: 'وفقاً للبند 9.2.1 في ISO 14001، متى يجب إجراء التدقيق الداخلي؟', options: ['أسبوعياً', 'شهرياً', 'سنوياً', 'على فترات مخططة'], correctAnswer: 'على فترات مخططة' },
+          
+          { id: 'ar-tf-1', lang: 'ar', type: 'TF', question: 'نظام إدارة البيئة هو نظام يركز على تلك الأنشطة التي تقوم بها الشركة والتي يمكن أن يكون لها تأثير إيجابي على سلامة وصحة السكان.', options: ['صح', 'خطأ'], correctAnswer: 'صح' },
+          { id: 'ar-tf-2', lang: 'ar', type: 'TF', question: 'إن تخفيف العبء على الهواء والماء والصخور والتربة والكائنات الحية والنظم البيئية يسمى أدوات التخفيض.', options: ['صح', 'خطأ'], correctAnswer: 'صح' },
+          { id: 'ar-tf-3', lang: 'ar', type: 'TF', question: 'إن عملية تنفيذ نظام الإدارة البيئية يجب أن تكون طوعية بالكامل.', options: ['صح', 'خطأ'], correctAnswer: 'صح' },
+          { id: 'ar-tf-4', lang: 'ar', type: 'TF', question: 'إن إدارة البيئة هي عملية دعم للقسم بأكمله، سواء في مجالات الإنتاج أو الإدارة.', options: ['صح', 'خطأ'], correctAnswer: 'صح' },
+          { id: 'ar-tf-5', lang: 'ar', type: 'TF', question: 'من الفوائد الاقتصادية والاجتماعية لنظم الإدارة البيئية أنها تعطي مزايا في العطاءات والمناقصات.', options: ['صح', 'خطأ'], correctAnswer: 'صح' },
+
+          // --- PAGE 4: ISO 14064-1 ---
+          { id: 'ar-17', lang: 'ar', type: 'MCQ', question: 'ما هو الغرض الأساسي من المواصفة الدولية ISO 14064-1؟', options: ['تقييم جودة المنتجات', 'تقييم الأداء المالي', 'تقييم انبعاثات الغازات الدفيئة', 'تقييم كفاءة الطاقة'], correctAnswer: 'تقييم انبعاثات الغازات الدفيئة' },
+          { id: 'ar-18', lang: 'ar', type: 'MCQ', question: 'أي من التالي يعتبر عنصراً أساسياً في نظام إدارة انبعاثات غازات الدفيئة وفقاً لـ ISO 14064-1؟', options: ['تحديد الأهداف المالية', 'تحديد حدود النظام', 'تحسين جودة المنتج', 'زيادة الإنتاج'], correctAnswer: 'تحديد حدود النظام' },
+          { id: 'ar-19', lang: 'ar', type: 'MCQ', question: 'ما هي الاستراتيجية الرئيسية لتقليل انبعاثات غازات الاحتباس الحراري؟', options: ['تحسين كفاءة الطاقة', 'استخدام الطاقة المتجددة', 'تقليل استهلاك المواد', 'جميع ما سبق'], correctAnswer: 'جميع ما سبق' },
+          { id: 'ar-20', lang: 'ar', type: 'MCQ', question: 'ما هي أهمية التحقق من البيانات في عملية تقييم الانبعاثات؟', options: ['ضمان دقة النتائج', 'تقليل التكاليف', 'زيادة الإنتاجية', 'تحسين صورة الشركة'], correctAnswer: 'ضمان دقة النتائج' },
+          { id: 'ar-21', lang: 'ar', type: 'MCQ', question: 'ما هي المراحل الرئيسية في دورة حياة المنتج التي يجب أخذها في الاعتبار عند تقييم الانبعاثات؟', options: ['الإنتاج والتوزيع فقط', 'الاستخراج، الإنتاج، التوزيع، الاستخدام، والتخلص', 'الإنتاج والاستخدام فقط', 'التوزيع والاستخدام فقط'], correctAnswer: 'الاستخراج، الإنتاج، التوزيع، الاستخدام، والتخلص' },
+          { id: 'ar-22', lang: 'ar', type: 'MCQ', question: 'ما هي أهمية تحديد حدود النظام في عملية تقييم الانبعاثات؟', options: ['تحديد المسؤوليات', 'ضمان دقة النتائج', 'تقليل التكاليف', 'كل ما سبق'], correctAnswer: 'كل ما سبق' },
+
+          // --- PAGE 5: ISO 14064-1 Cont. ---
+          { id: 'ar-23', lang: 'ar', type: 'MCQ', question: 'ما هي الاستراتيجية الرئيسية لتقليل انبعاثات غازات الدفيئة للمنظمات؟', options: ['تحسين كفاءة الطاقة', 'استخدام الطاقة المتجددة', 'تقليل استهلاك المواد', 'زيادة الإنتاجية'], correctAnswer: 'تحسين كفاءة الطاقة' },
+          { id: 'ar-24', lang: 'ar', type: 'MCQ', question: 'أي من الغازات الدفيئة التالية له أقوى تأثير على الاحترار العالمي على المدى القصير؟', options: ['ثاني أكسيد الكربون (CO2)', 'الميثان (CH4)', 'أكسيد النيتروز (N2O)', 'الفريونات (CFCs)'], correctAnswer: 'الفريونات (CFCs)' },
+          { id: 'ar-25', lang: 'ar', type: 'MCQ', question: 'ما الذي يمكن أن يخبرنا به مؤشر "مساحة الغابات"؟', options: ['كمية المياه العذبة', 'مدى نظافة الهواء والماء', 'التنوع البيولوجي', 'جميع الخيارات السابقة'], correctAnswer: 'جميع الخيارات السابقة' },
+
+          { id: 'ar-tf-6', lang: 'ar', type: 'TF', question: 'هل مواصفة ISO 14064-1 تتعلق بتحديد انبعاثات غازات الاحتباس الحراري؟', options: ['صح', 'خطأ'], correctAnswer: 'صح' },
+          { id: 'ar-tf-7', lang: 'ar', type: 'TF', question: 'هل مواصفة ISO 14064-1 تهدف إلى تحسين كفاءة الطاقة فقط؟', options: ['صح', 'خطأ'], correctAnswer: 'خطأ' },
+          { id: 'ar-tf-8', lang: 'ar', type: 'TF', question: 'هل مواصفة ISO 14064-1 تشمل تقنيات حساب الانبعاثات؟', options: ['صح', 'خطأ'], correctAnswer: 'صح' },
+          { id: 'ar-tf-9', lang: 'ar', type: 'TF', question: 'هل مواصفة ISO 14064-1 تتعلق بالتأثيرات البيئية فقط؟', options: ['صح', 'خطأ'], correctAnswer: 'خطأ' },
+          { id: 'ar-tf-10', lang: 'ar', type: 'TF', question: 'هل يجب تحديد مصادر الانبعاثات حسب مواصفة ISO 14064-1؟', options: ['صح', 'خطأ'], correctAnswer: 'صح' },
+          { id: 'ar-tf-11', lang: 'ar', type: 'TF', question: 'هل يجب استخدام نماذج رياضية لتحليل الانبعاثات؟', options: ['صح', 'خطأ'], correctAnswer: 'صح' },
+          { id: 'ar-tf-12', lang: 'ar', type: 'TF', question: 'هل يجب تحليل البيانات لتحديد الانبعاثات؟', options: ['صح', 'خطأ'], correctAnswer: 'صح' },
+          { id: 'ar-tf-13', lang: 'ar', type: 'TF', question: 'هل يجب تقديم تقرير عن الانبعاثات حسب مواصفة ISO 14064-1؟', options: ['صح', 'خطأ'], correctAnswer: 'صح' },
+          { id: 'ar-tf-14', lang: 'ar', type: 'TF', question: 'هل يجب تضمين بيانات الانبعاثات في التقرير؟', options: ['صح', 'خطأ'], correctAnswer: 'صح' },
+
+          // --- PAGE 6: ISO 14069 ---
+          { id: 'ar-26', lang: 'ar', type: 'MCQ', question: 'ISO 14069: ما هي العوامل التي يجب مراعاتها عند اختيار عوامل الانبعاث؟', options: ['نوع الوقود المستخدم', 'تقنية الاحتراق', 'كفاءة الطاقة', 'كل ما سبق'], correctAnswer: 'كل ما سبق' },
+          { id: 'ar-27', lang: 'ar', type: 'MCQ', question: 'ما هي أهمية التحسين المستمر في نظام إدارة انبعاثات غازات الدفيئة؟', options: ['ضمان الامتثال للوائح', 'تقليل التكاليف', 'تحسين الأداء البيئي', 'كل ما سبق'], correctAnswer: 'كل ما سبق' },
+          { id: 'ar-28', lang: 'ar', type: 'MCQ', question: 'ما هو المصدر الرئيسي لانبعاثات ثاني أكسيد الكربون (CO2)؟', options: ['استهلاك الوقود الأحفوري', 'إنتاج الطاقة الكهرومائية', 'إنتاج الأغذية العضوية', 'إعادة تدوير المياه'], correctAnswer: 'استهلاك الوقود الأحفوري' },
+          { id: 'ar-29', lang: 'ar', type: 'MCQ', question: 'أي من الأنشطة البشرية التالية يساهم بشكل كبير في زيادة الانبعاثات؟', options: ['الزراعة العضوية', 'حرق الوقود الأحفوري', 'إعادة تدوير النفايات', 'زراعة الأشجار'], correctAnswer: 'حرق الوقود الأحفوري' },
+          { id: 'ar-30', lang: 'ar', type: 'MCQ', question: 'ما هي الفئة الرئيسية لانبعاثات غازات الدفيئة للمنظمات (النطاق 1)؟', options: ['الانبعاثات المباشرة', 'الانبعاثات غير المباشرة (Scope 2)', 'الانبعاثات غير المباشرة الأخرى (Scope 3)', 'الانبعاثات العرضية'], correctAnswer: 'الانبعاثات المباشرة' },
+          { id: 'ar-31', lang: 'ar', type: 'MCQ', question: 'ما هو الهدف الرئيسي لبروتوكول غازات الدفيئة (GHG Protocol)؟', options: ['تحديد انبعاثات غازات الدفيئة للمنظمات', 'تحديد تأثيرات المناخ', 'تحديد التكاليف', 'تحديد فرص الاستثمار'], correctAnswer: 'تحديد انبعاثات غازات الدفيئة للمنظمات' },
+          
+          // --- PAGE 7: ISO 14069 Cont. & ISO 14064-2 ---
+          { id: 'ar-32', lang: 'ar', type: 'MCQ', question: 'ما هي الأداة الرئيسية لقياس انبعاثات غازات الدفيئة للمنظمات؟', options: ['نظام إدارة البيئة', 'نظام إدارة الطاقة', 'أداة حساب انبعاثات غازات الدفيئة (Calculator)', 'برنامج الموارد البشرية'], correctAnswer: 'أداة حساب انبعاثات غازات الدفيئة (Calculator)' },
+          { id: 'ar-33', lang: 'ar', type: 'MCQ', question: 'ما هي المادة الرئيسية التي تؤثر على انبعاثات غازات الدفيئة في عمليات الإنتاج؟', options: ['الطاقة الكهربائية', 'الوقود الأحفوري', 'المواد الكيميائية', 'المياه'], correctAnswer: 'الوقود الأحفوري' },
+          { id: 'ar-34', lang: 'ar', type: 'MCQ', question: 'ما هي اللوائح الرئيسية لتقليل انبعاثات غازات الاحتباس الحراري؟', options: ['تحديد أهداف انبعاثات', 'تطبيق لوائح بيئية', 'دعم تقنيات نظيفة', 'جميعا'], correctAnswer: 'جميعا' },
+          { id: 'ar-35', lang: 'ar', type: 'MCQ', question: 'ما هو الهدف من تحليل دورة الحياة في مواصفة ISO 14069؟', options: ['تحديد الانبعاثات الغازية', 'تقييم التأثيرات البيئية', 'تحسين كفاءة الطاقة', 'جميعا'], correctAnswer: 'جميعا' },
+
+          { id: 'ar-36', lang: 'ar', type: 'MCQ', question: 'ما هو الهدف الرئيسي من تطبيق المواصفة ISO 14064-2؟', options: ['تقليل تكاليف الشركات', 'تحسين الأداء البيئي من خلال قياس وتقليل الانبعاثات (المشاريع)', 'زيادة الإنتاجية', 'تحسين جودة المنتجات'], correctAnswer: 'تحسين الأداء البيئي من خلال قياس وتقليل الانبعاثات (المشاريع)' },
+          { id: 'ar-37', lang: 'ar', type: 'MCQ', question: 'أي من هذه الأنشطة يمكن أن يساهم في تقليل الانبعاثات في صناعة الأسمنت؟', options: ['استخدام الفحم', 'استخدام تقنيات احتجاز وتخزين الكربون (CCS)', 'زيادة استهلاك الطاقة', 'تقليل الكفاءة'], correctAnswer: 'استخدام تقنيات احتجاز وتخزين الكربون (CCS)' },
+          { id: 'ar-38', lang: 'ar', type: 'MCQ', question: 'في الزراعة، كيف يمكن تطبيق المواصفة 14064-2 لتحقيق خفض الانبعاثات؟', options: ['تحسين كفاءة استخدام الأسمدة', 'زيادة استخدام الآلات الثقيلة', 'زراعة المحاصيل المعدلة', 'تقليل المساحات'], correctAnswer: 'تحسين كفاءة استخدام الأسمدة' },
+
+          // --- PAGE 8: ISO 14064-2 Cont. ---
+          { id: 'ar-39', lang: 'ar', type: 'MCQ', question: 'ما هو دور الطاقة المتجددة في تقليل الانبعاثات الكربونية في صناعة البترول؟', options: ['تقليل تكلفة الإنتاج', 'تقليل الاعتماد على الوقود الأحفوري', 'زيادة الانبعاثات', 'زيادة استهلاك الطاقة'], correctAnswer: 'تقليل الاعتماد على الوقود الأحفوري' },
+          { id: 'ar-40', lang: 'ar', type: 'MCQ', question: 'كيف يمكن لصناعة الحديد والصلب استخدام المواصفة 14064 لخفض الانبعاثات؟', options: ['تحسين كفاءة الفرن الكهربائي', 'زيادة التلوث', 'استخدام أساليب قديمة', 'زيادة استهلاك الطاقة'], correctAnswer: 'تحسين كفاءة الفرن الكهربائي' },
+          { id: 'ar-41', lang: 'ar', type: 'MCQ', question: 'ما هي الفائدة الرئيسية من إعداد تقرير المراجعة الخارجية في سياق ISO 14064؟', options: ['ضمان دقة البيانات', 'تحسين التسويق', 'تقليل التكاليف التشغيلية', 'تحسين الإنتاجية'], correctAnswer: 'ضمان دقة البيانات' },
+
+          { id: 'ar-tf-15', lang: 'ar', type: 'TF', question: 'يجب أن يشمل مشروع خفض انبعاثات الكربون توثيق وتحديد سنة الأساس.', options: ['صح', 'خطأ'], correctAnswer: 'صح' },
+          { id: 'ar-tf-16', lang: 'ar', type: 'TF', question: 'يجب أن يشمل المشروع فقط الأنشطة التي تقلل الانبعاثات دون النظر إلى إزالة غازات الدفيئة.', options: ['صح', 'خطأ'], correctAnswer: 'خطأ' },
+          { id: 'ar-tf-17', lang: 'ar', type: 'TF', question: 'تعد مراجعة البيانات جزءاً أساسياً من عملية إعداد تقرير الانبعاثات حسب ISO 14064-2.', options: ['صح', 'خطأ'], correctAnswer: 'صح' },
+          { id: 'ar-tf-18', lang: 'ar', type: 'TF', question: 'يجب على المشاريع الالتزام بمقاييس 14064-2 ولا يتطلب الأمر التشاور مع الجهات التنظيمية.', options: ['صح', 'خطأ'], correctAnswer: 'خطأ' },
+          { id: 'ar-tf-19', lang: 'ar', type: 'TF', question: 'يطلب من المشاريع تقديم تقارير سنوية لقياس الانبعاثات فقط دون الحاجة إلى مراجع خارجية.', options: ['صح', 'خطأ'], correctAnswer: 'خطأ' },
+          { id: 'ar-tf-20', lang: 'ar', type: 'TF', question: 'يمكن للمشروع تحديد عوامل إزالة الكربون بناءً على معايير علمية معترف بها.', options: ['صح', 'خطأ'], correctAnswer: 'صح' },
+          { id: 'ar-tf-21', lang: 'ar', type: 'TF', question: 'يتعين على المشاريع تحديد حدود النظام بشكل دقيق لتحديد مصادر الانبعاثات.', options: ['صح', 'خطأ'], correctAnswer: 'صح' },
+
+          // --- PAGE 9: ISO 50001 (English) ---
+          { id: 'en-1', lang: 'en', type: 'MCQ', question: 'ISO 50001: What does energy management primarily focus on?', options: ['Reducing costs in all departments', 'Systematic attention to energy to improve performance', 'Increasing the number of employees', 'Expanding product lines'], correctAnswer: 'Systematic attention to energy to improve performance' },
+          { id: 'en-2', lang: 'en', type: 'MCQ', question: 'What is the main objective of energy management?', options: ['Increased energy costs', 'Enhanced operational efficiency and reduced environmental impact', 'Decreased employee productivity', 'Higher turnover rates'], correctAnswer: 'Enhanced operational efficiency and reduced environmental impact' },
+          { id: 'en-3', lang: 'en', type: 'MCQ', question: 'What is the main objective of energy management? (Variant 2)', options: ['To increase energy consumption', 'To continually improve the energy performance of the organization', 'To reduce the workforce', 'To enhance marketing strategies'], correctAnswer: 'To continually improve the energy performance of the organization' },
+          { id: 'en-4', lang: 'en', type: 'MCQ', question: 'What does energy efficiency refer to?', options: ['Total energy consumed', 'The relationship between output of performance and energy input', 'Cost of energy per unit', 'Number of employees'], correctAnswer: 'The relationship between output of performance and energy input' },
+          { id: 'en-5', lang: 'en', type: 'MCQ', question: 'Which best describes the goal of maintaining energy performance improvements?', options: ['Minimize costs', 'Sustain energy efficiency gains over time', 'Increase suppliers', 'Reduce organization size'], correctAnswer: 'Sustain energy efficiency gains over time' },
+          { id: 'en-6', lang: 'en', type: 'MCQ', question: 'In energy management, what is meant by "systematic attention"?', options: ['Random checks', 'A structured approach to monitoring and improving energy use', 'Ignoring consumption', 'Financial focus only'], correctAnswer: 'A structured approach to monitoring and improving energy use' },
+
+          // --- PAGE 10: ISO 50001 Cont. ---
+          { id: 'en-7', lang: 'en', type: 'MCQ', question: 'What is a potential benefit of improving energy performance in an organization?', options: ['Increased costs', 'Enhanced operational efficiency and reduced environmental impact', 'Decreased productivity', 'Higher turnover'], correctAnswer: 'Enhanced operational efficiency and reduced environmental impact' },
+          { id: 'en-8', lang: 'en', type: 'MCQ', question: 'What is the first key component in the energy management process?', options: ['Analysis', 'Data Collection', 'Goal Setting', 'Implementation'], correctAnswer: 'Data Collection' },
+          { id: 'en-9', lang: 'en', type: 'MCQ', question: 'Which component involves evaluating the data collected to understand energy usage?', options: ['Monitoring', 'Implementation', 'Analysis', 'Goal Setting'], correctAnswer: 'Analysis' },
+          { id: 'en-10', lang: 'en', type: 'MCQ', question: 'What is the purpose of the Goal Setting component?', options: ['Collect data', 'Define specific energy efficiency objectives', 'Monitor consumption', 'Implement measures'], correctAnswer: 'Define specific energy efficiency objectives' },
+          
+          { id: 'en-tf-1', lang: 'en', type: 'TF', question: 'Conducting an energy review is the first step in the energy management process.', options: ['True', 'False'], correctAnswer: 'True' },
+          { id: 'en-tf-2', lang: 'en', type: 'TF', question: 'Identifying Significant Energy Uses (SEUs) is not necessary for establishing energy baselines.', options: ['True', 'False'], correctAnswer: 'False' },
+          { id: 'en-tf-3', lang: 'en', type: 'TF', question: 'Establishing energy performance indicators (EnPIs) is part of the process of improving energy performance.', options: ['True', 'False'], correctAnswer: 'True' },
+          { id: 'en-tf-4', lang: 'en', type: 'TF', question: 'Creating a list of opportunities and action plans is an essential step in the energy management process.', options: ['True', 'False'], correctAnswer: 'True' },
+          { id: 'en-tf-5', lang: 'en', type: 'TF', question: 'Setting objectives and energy targets is unnecessary for delivering results.', options: ['True', 'False'], correctAnswer: 'False' },
+          { id: 'en-tf-6', lang: 'en', type: 'TF', question: 'Preparing a data collection plan is a crucial step in monitoring energy performance.', options: ['True', 'False'], correctAnswer: 'True' },
+          { id: 'en-tf-7', lang: 'en', type: 'TF', question: 'An Energy Performance Indicator (EnPI) is a measure or unit of energy performance defined by the organization.', options: ['True', 'False'], correctAnswer: 'True' },
+          { id: 'en-tf-8', lang: 'en', type: 'TF', question: 'The EnPI value is a quantification of the EnPI at a specific point in time or over a specified period.', options: ['True', 'False'], correctAnswer: 'True' },
+          { id: 'en-tf-9', lang: 'en', type: 'TF', question: 'A static factor is a variable that routinely changes and does not significantly impact energy performance.', options: ['True', 'False'], correctAnswer: 'False' },
+          { id: 'en-tf-10', lang: 'en', type: 'TF', question: 'A relevant variable is a quantifiable factor that significantly impacts energy performance and routinely changes.', options: ['True', 'False'], correctAnswer: 'True' },
+
           // --- PAGE 11: LCA ---
-          {
-            id: 'en-6',
-            lang: 'en',
-            type: 'MCQ',
-            question: 'A Life cycle assessment should be done as a comparison of the _____ in different stages in the life cycle.',
-            options: ['Impact on the environment', 'Effect of pollution', 'Value judgment'],
-            correctAnswer: 'Impact on the environment'
-          },
-          {
-            id: 'en-7',
-            lang: 'en',
-            type: 'MCQ',
-            question: 'We can _____ the use of water, resources, energy sources and raw material for an LCA.',
-            options: ['Life cycle assessment', 'Evaluate', 'Calculate'],
-            correctAnswer: 'Evaluate'
-          },
-          {
-            id: 'en-8',
-            lang: 'en',
-            type: 'MCQ',
-            question: 'The EPD is independently _____ that communicates transparent environment life cycle impact of products in credible manner.',
-            options: ['First party', 'Second party', 'Third party'],
-            correctAnswer: 'Third party'
-          },
-          {
-            id: 'en-9',
-            lang: 'en',
-            type: 'MCQ',
-            question: 'Companies shall avoid allocation wherever possible by using:',
-            options: ['Process subdivision', 'Redefining the functional unit', 'Using system expansion', 'All of the above'],
-            correctAnswer: 'All of the above'
-          },
+          { id: 'en-11', lang: 'en', type: 'MCQ', question: 'A Life cycle assessment should be done as a comparison of the _____ in different stages in the life cycle.', options: ['Impact on the environment', 'Effect of pollution', 'Value judgment'], correctAnswer: 'Impact on the environment' },
+          { id: 'en-12', lang: 'en', type: 'MCQ', question: 'We can _____ the use of water, resources, energy sources and raw material for an LCA.', options: ['Life cycle assessment', 'Evaluate', 'Calculate'], correctAnswer: 'Evaluate' },
+          { id: 'en-13', lang: 'en', type: 'MCQ', question: 'The EPD is independently _____ that communicates transparent environment life cycle impact of products in credible manner.', options: ['First party', 'Second party', 'Third party'], correctAnswer: 'Third party' },
+          { id: 'en-14', lang: 'en', type: 'MCQ', question: 'Companies shall avoid allocation wherever possible by using:', options: ['Process subdivision', 'Redefining the functional unit', 'Using system expansion', 'All of the above'], correctAnswer: 'All of the above' },
+          { id: 'en-15', lang: 'en', type: 'MCQ', question: 'The abiotic depletion potential (ADP) for minerals and metals non fossil resources used as reference:', options: ['1 kg of antimony', '1 kg of soft coal', '1 kg of hard coal'], correctAnswer: '1 kg of antimony' },
+          { id: 'en-16', lang: 'en', type: 'MCQ', question: 'The second step of interpretation phase is evaluation that considers:', options: ['Consistency analysis', 'Sensitivity analysis', 'Completeness analysis', 'All of the above'], correctAnswer: 'All of the above' },
+
           // --- PAGE 12: LCA T/F & ISO 14067 ---
-          {
-            id: 'en-tf-4',
-            lang: 'en',
-            type: 'TF',
-            question: 'The comparison between two different products with same function is accepted in LCA.',
-            options: ['True', 'False'],
-            correctAnswer: 'True'
-          },
-          {
-            id: 'en-tf-5',
-            lang: 'en',
-            type: 'TF',
-            question: 'The primary data is always site specific data.',
-            options: ['True', 'False'],
-            correctAnswer: 'True'
-          },
-          {
-            id: 'en-10',
-            lang: 'en',
-            type: 'MCQ',
-            question: 'What is the primary driver of climate change according to scientific consensus?',
-            options: ['Natural climate cycles', 'Human activities, particularly fossil fuel combustion', 'Solar radiation changes', 'Volcanic eruptions'],
-            correctAnswer: 'Human activities, particularly fossil fuel combustion'
-          },
-          {
-            id: 'en-11',
-            lang: 'en',
-            type: 'MCQ',
-            question: 'Which of the following is NOT a major greenhouse gas (GHG)?',
-            options: ['Carbon Dioxide (CO2)', 'Methane (CH4)', 'Nitrous Oxide (N2O)', 'Oxygen (O2)'],
-            correctAnswer: 'Oxygen (O2)'
-          },
-          // --- PAGE 13: ISO 14067 ---
-          {
-            id: 'en-12',
-            lang: 'en',
-            type: 'MCQ',
-            question: 'What does the term "carbon footprint" refer to?',
-            options: ['Amount of carbon in atmosphere', 'Total GHG emissions associated with an activity, product, or individual', 'Physical footprint of carbon fuel', 'Area of land for offsetting'],
-            correctAnswer: 'Total GHG emissions associated with an activity, product, or individual'
-          },
-          {
-            id: 'en-13',
-            lang: 'en',
-            type: 'MCQ',
-            question: 'What is the purpose of ISO 14067?',
-            options: ['To provide guidelines for carbon neutrality', 'To focus on the carbon footprint of products', 'To assess financial risks', 'To measure water usage'],
-            correctAnswer: 'To focus on the carbon footprint of products'
-          },
-          {
-            id: 'en-14',
-            lang: 'en',
-            type: 'MCQ',
-            question: 'Which scope of emissions includes direct GHG emissions from owned or controlled sources?',
-            options: ['Scope 1', 'Scope 2', 'Scope 3', 'Scope 4'],
-            correctAnswer: 'Scope 1'
-          },
-          // --- PAGE 14: T/F & GHG Protocol ---
-          {
-            id: 'en-tf-6',
-            lang: 'en',
-            type: 'TF',
-            question: 'Nitrous Oxide (N2O) is NOT a major greenhouse gas (GHG)?',
-            options: ['True', 'False'],
-            correctAnswer: 'False'
-          },
-          {
-            id: 'en-tf-7',
-            lang: 'en',
-            type: 'TF',
-            question: 'Life Cycle Assessment (LCA) evaluates the Environmental impacts of a product throughout its entire life cycle.',
-            options: ['True', 'False'],
-            correctAnswer: 'True'
-          },
-          {
-            id: 'en-15',
-            lang: 'en',
-            type: 'MCQ',
-            question: 'GHG Protocol: Global warming is caused by:',
-            options: ['Methane', 'Nitrogen dioxide', 'Greenhouse gases', 'Hydrogen'],
-            correctAnswer: 'Greenhouse gases'
-          },
-          {
-            id: 'en-16',
-            lang: 'en',
-            type: 'MCQ',
-            question: 'Green House Effect is due to:',
-            options: ['Ozone layer', 'Infrared layer', 'Moisture layer', 'CO2 layer in the atmosphere'],
-            correctAnswer: 'CO2 layer in the atmosphere'
-          },
-          // --- PAGE 15: GHG Protocol ---
-          {
-            id: 'en-17',
-            lang: 'en',
-            type: 'MCQ',
-            question: 'The GHG Protocol define and categorize emissions into the following:',
-            options: ['Direct Emissions', 'Indirect Emissions', 'Direct and Indirect Emissions', 'None of the above'],
-            correctAnswer: 'Direct and Indirect Emissions'
-          },
-          {
-            id: 'en-18',
-            lang: 'en',
-            type: 'MCQ',
-            question: 'GHG emissions typically occur from the following source categories:',
-            options: ['Stationary combustion and Fugitive', 'Mobile combustion, Process', 'Stationary, Mobile, Process and Fugitive', 'Stationary combustion only'],
-            correctAnswer: 'Stationary, Mobile, Process and Fugitive'
-          },
-          {
-            id: 'en-19',
-            lang: 'en',
-            type: 'MCQ',
-            question: 'The emission factor is:',
-            options: ['The factor that converts activity data into GHG emissions data', 'Value of collected data', 'Molecular weight', 'Equivalent weight'],
-            correctAnswer: 'The factor that converts activity data into GHG emissions data'
-          },
-          {
-            id: 'en-20',
-            lang: 'en',
-            type: 'MCQ',
-            question: 'The principles of GHG accounting are:',
-            options: ['Transparency and Accountability', 'Completeness and Consistency', 'Accuracy, Completeness and Consistency', 'Relevance, Completeness, Consistency, Transparency and Accuracy'],
-            correctAnswer: 'Relevance, Completeness, Consistency, Transparency and Accuracy'
-          },
-          // --- PAGE 16: T/F & IPCC ---
-          {
-            id: 'en-tf-8',
-            lang: 'en',
-            type: 'TF',
-            question: 'GHG Protocol defines 5 categories of scope 3 emissions.',
-            options: ['True', 'False'],
-            correctAnswer: 'False' // It defines 15 categories usually
-          },
-          {
-            id: 'en-tf-9',
-            lang: 'en',
-            type: 'TF',
-            question: 'Scope 3 emissions accounting is mandatory according to GHG Protocol.',
-            options: ['True', 'False'],
-            correctAnswer: 'False' // It is optional for the corporate standard
-          },
-          {
-            id: 'en-21',
-            lang: 'en',
-            type: 'MCQ',
-            question: 'IPCC: What is the primary emission source category for fugitive emissions in the petroleum sector?',
-            options: ['Combustion from flaring', 'Fugitive emissions from equipment leaks', 'Process emissions', 'Biomass combustion'],
-            correctAnswer: 'Fugitive emissions from equipment leaks'
-          },
-          {
-            id: 'en-22',
-            lang: 'en',
-            type: 'MCQ',
-            question: 'Why does the IPCC recommend tiered approaches for emission estimation?',
-            options: ['To match deadline', 'To balance accuracy with available data quality and resources', 'Simplify data', 'Avoid country-specific data'],
-            correctAnswer: 'To balance accuracy with available data quality and resources'
-          },
+          { id: 'en-tf-11', lang: 'en', type: 'TF', question: 'The International Standard ISO 14040 covers three types of studies.', options: ['True', 'False'], correctAnswer: 'False' },
+          { id: 'en-tf-12', lang: 'en', type: 'TF', question: 'The marketing and informing decision making are most important benefits of conducting LCA.', options: ['True', 'False'], correctAnswer: 'True' },
+          { id: 'en-tf-13', lang: 'en', type: 'TF', question: 'The PCR sets out what you need in define functional units only.', options: ['True', 'False'], correctAnswer: 'False' },
+          { id: 'en-tf-14', lang: 'en', type: 'TF', question: 'The comparison between two different products with same function is accepted.', options: ['True', 'False'], correctAnswer: 'True' },
+          { id: 'en-tf-15', lang: 'en', type: 'TF', question: 'The goal is the first component of LCA and didn\'t need explain the reason of study.', options: ['True', 'False'], correctAnswer: 'False' },
+          { id: 'en-tf-16', lang: 'en', type: 'TF', question: 'The primary data always site specific data.', options: ['True', 'False'], correctAnswer: 'True' },
+          { id: 'en-tf-17', lang: 'en', type: 'TF', question: 'In LCI must relating the data to unit process and functional unit after validation of data.', options: ['True', 'False'], correctAnswer: 'True' },
+
+          { id: 'en-17', lang: 'en', type: 'MCQ', question: 'What is the primary driver of climate change according to scientific consensus?', options: ['Natural climate cycles', 'Human activities, particularly fossil fuel combustion', 'Solar radiation changes', 'Volcanic eruptions'], correctAnswer: 'Human activities, particularly fossil fuel combustion' },
+          { id: 'en-18', lang: 'en', type: 'MCQ', question: 'Which of the following is NOT a major greenhouse gas (GHG)?', options: ['Carbon Dioxide (CO2)', 'Methane (CH4)', 'Nitrous Oxide (N2O)', 'Oxygen (O2)'], correctAnswer: 'Oxygen (O2)' },
+          { id: 'en-19', lang: 'en', type: 'MCQ', question: 'What is the greenhouse effect?', options: ['A process that cools the Earth', 'A natural process that warms the Earth\'s surface by trapping heat', 'Occurs only in urban areas', 'Reducing carbon emissions'], correctAnswer: 'A natural process that warms the Earth\'s surface by trapping heat' },
+          
+          // --- PAGE 13: ISO 14067 Cont. ---
+          { id: 'en-20', lang: 'en', type: 'MCQ', question: 'Which international agreement aims to reduce greenhouse gas emissions globally?', options: ['Kyoto Protocol', 'Paris Agreement', 'Montreal Protocol', 'Rio Declaration'], correctAnswer: 'Paris Agreement' },
+          { id: 'en-21', lang: 'en', type: 'MCQ', question: 'What does the term "carbon footprint" refer to?', options: ['Amount of carbon in atmosphere', 'Total GHG emissions associated with an activity, product, or individual', 'Physical footprint of carbon fuel', 'Area of land for offsetting'], correctAnswer: 'Total GHG emissions associated with an activity, product, or individual' },
+          { id: 'en-22', lang: 'en', type: 'MCQ', question: 'Which of the following is a component of the Greenhouse Gas Protocol?', options: ['Corporate Standard', 'EIA', 'LCA', 'Carbon Neutrality Framework'], correctAnswer: 'Corporate Standard' },
+          { id: 'en-23', lang: 'en', type: 'MCQ', question: 'What is the purpose of ISO 14067?', options: ['Guidelines for carbon neutrality', 'Focus on the carbon footprint of products', 'Assess financial risks', 'Measure water usage'], correctAnswer: 'Focus on the carbon footprint of products' },
+          { id: 'en-24', lang: 'en', type: 'MCQ', question: 'Which scope of emissions includes direct GHG emissions from owned or controlled sources?', options: ['Scope 1', 'Scope 2', 'Scope 3', 'Scope 4'], correctAnswer: 'Scope 1' },
+          { id: 'en-25', lang: 'en', type: 'MCQ', question: 'What is the main goal of the Partnership for Carbon Accounting Financials (PCAF)?', options: ['Promote renewable energy', 'Standardize carbon accounting for the financial sector', 'Reduce emissions in manufacturing', 'Enhance public awareness'], correctAnswer: 'Standardize carbon accounting for the financial sector' },
+          { id: 'en-26', lang: 'en', type: 'MCQ', question: 'Which of the following is a significant impact of climate change?', options: ['Decreased biodiversity', 'Increased agricultural productivity', 'Stabilized weather patterns', 'Reduced sea levels'], correctAnswer: 'Decreased biodiversity' },
+
+          // --- PAGE 14: ISO 14067 T/F & GHG Protocol ---
+          { id: 'en-tf-18', lang: 'en', type: 'TF', question: 'Human activities, particularly fossil fuel combustion are the primary driver of climate change.', options: ['True', 'False'], correctAnswer: 'True' },
+          { id: 'en-tf-19', lang: 'en', type: 'TF', question: 'Nitrous Oxide (N2O) is NOT a major greenhouse gas (GHG)?', options: ['True', 'False'], correctAnswer: 'False' },
+          { id: 'en-tf-20', lang: 'en', type: 'TF', question: 'Scope 1 is the scope of emissions includes direct GHG emissions from owned or controlled sources.', options: ['True', 'False'], correctAnswer: 'True' },
+          { id: 'en-tf-21', lang: 'en', type: 'TF', question: 'For carbon footprint of product, system boundaries should include scope 1, scope 2 and scope 3.', options: ['True', 'False'], correctAnswer: 'True' },
+          { id: 'en-tf-22', lang: 'en', type: 'TF', question: 'Life Cycle Assessment (LCA) evaluates the Environmental impacts of a product throughout its entire life cycle.', options: ['True', 'False'], correctAnswer: 'True' },
+          { id: 'en-tf-23', lang: 'en', type: 'TF', question: 'Product CFP focuses specifically on GHG emissions but LCA focuses on all environmental impact categories.', options: ['True', 'False'], correctAnswer: 'True' },
+          { id: 'en-tf-24', lang: 'en', type: 'TF', question: 'The main goal of quantifying the carbon footprint (CFP) is to calculate the potential contribution of a product to global warming.', options: ['True', 'False'], correctAnswer: 'True' },
+          { id: 'en-tf-25', lang: 'en', type: 'TF', question: 'The avoidance of double-counting ensures that the same environmental impacts are not counted multiple times.', options: ['True', 'False'], correctAnswer: 'True' },
+          { id: 'en-tf-26', lang: 'en', type: 'TF', question: 'The first step in the methodology for quantifying the product CFP is impact assessment.', options: ['True', 'False'], correctAnswer: 'False' },
+          { id: 'en-tf-27', lang: 'en', type: 'TF', question: 'The main goal of CFP is to calculate potential contribution to global warming (Repeated concept).', options: ['True', 'False'], correctAnswer: 'True' },
+
+          { id: 'en-27', lang: 'en', type: 'MCQ', question: 'GHG Protocol: Global warming is caused by:', options: ['Methane', 'Nitrogen dioxide', 'Greenhouse gases', 'Hydrogen'], correctAnswer: 'Greenhouse gases' },
+          { id: 'en-28', lang: 'en', type: 'MCQ', question: 'Green House Effect is due to:', options: ['Ozone layer', 'Infrared layer', 'Moisture layer', 'CO2 layer in the atmosphere'], correctAnswer: 'CO2 layer in the atmosphere' },
+          { id: 'en-29', lang: 'en', type: 'MCQ', question: 'Which of the following is not a Greenhouse gas?', options: ['CO2', 'Ozone', 'N2O', 'SO2'], correctAnswer: 'SO2' },
+
+          // --- PAGE 15: GHG Protocol Cont. ---
+          { id: 'en-30', lang: 'en', type: 'MCQ', question: 'The greenhouse effect which is causing an increase in the atmospheric temperature is mainly due to:', options: ['Oxygen', 'Nitrogen', 'Carbon dioxide', 'None'], correctAnswer: 'Carbon dioxide' },
+          { id: 'en-31', lang: 'en', type: 'MCQ', question: 'The GHG Protocol define and categorize emissions into:', options: ['Direct Emissions', 'Indirect Emissions', 'Direct and Indirect Emissions', 'None'], correctAnswer: 'Direct and Indirect Emissions' },
+          { id: 'en-32', lang: 'en', type: 'MCQ', question: 'GHG emissions typically occur from the following source categories:', options: ['Stationary & Fugitive', 'Mobile & Process', 'Stationary, Mobile, Process and Fugitive', 'Stationary only'], correctAnswer: 'Stationary, Mobile, Process and Fugitive' },
+          { id: 'en-33', lang: 'en', type: 'MCQ', question: 'The emission factor is:', options: ['The factor that converts activity data into GHG emissions data', 'Value of data', 'Molecular weight', 'Equivalent weight'], correctAnswer: 'The factor that converts activity data into GHG emissions data' },
+          { id: 'en-34', lang: 'en', type: 'MCQ', question: 'The principles of GHG accounting are:', options: ['Transparency & Accountability', 'Completeness & Consistency', 'Accuracy, Completeness & Consistency', 'Relevance, Completeness, Consistency, Transparency and Accuracy'], correctAnswer: 'Relevance, Completeness, Consistency, Transparency and Accuracy' },
+          { id: 'en-35', lang: 'en', type: 'MCQ', question: 'The aim of managing inventory quality is:', options: ['Increase profit', 'Enhancing reputation', 'Effective reporting of emissions', 'Competitive advantage'], correctAnswer: 'Effective reporting of emissions' },
+          { id: 'en-36', lang: 'en', type: 'MCQ', question: 'The main step necessary for calculating and reporting the organization carbon footprint:', options: ['Collecting and managing data', 'Selection of emission factors', 'Using EMS standards', 'Customer feedback'], correctAnswer: 'Collecting and managing data' },
+
+          // --- PAGE 16: GHG Protocol T/F & IPCC ---
+          { id: 'en-tf-28', lang: 'en', type: 'TF', question: 'Forestation, reforestation and forest planting considered as natural carbon sinks.', options: ['True', 'False'], correctAnswer: 'True' },
+          { id: 'en-tf-29', lang: 'en', type: 'TF', question: 'GHG protocol can be applied by industrial companies only.', options: ['True', 'False'], correctAnswer: 'False' },
+          { id: 'en-tf-30', lang: 'en', type: 'TF', question: 'GHG Protocol defines 5 categories of scope 3 emissions.', options: ['True', 'False'], correctAnswer: 'False' },
+          { id: 'en-tf-31', lang: 'en', type: 'TF', question: 'Scope 3 emissions accounting is mandatory according to GHG Protocol.', options: ['True', 'False'], correctAnswer: 'False' },
+          { id: 'en-tf-32', lang: 'en', type: 'TF', question: 'Oxygen, Nitrogen, and Argon are not examples of greenhouse gases according to GHG protocol.', options: ['True', 'False'], correctAnswer: 'True' },
+          { id: 'en-tf-33', lang: 'en', type: 'TF', question: 'The determination of the organizational and operational boundaries is one of the most important steps for calculating GHG emissions.', options: ['True', 'False'], correctAnswer: 'True' },
+
+          { id: 'en-37', lang: 'en', type: 'MCQ', question: 'IPCC: What is the primary emission source category for fugitive emissions in the petroleum sector?', options: ['Flaring combustion', 'Fugitive emissions from equipment leaks', 'Process emissions', 'Biomass combustion'], correctAnswer: 'Fugitive emissions from equipment leaks' },
+          { id: 'en-38', lang: 'en', type: 'MCQ', question: 'Why does the IPCC recommend tiered approaches for emission estimation?', options: ['Match deadlines', 'Balance accuracy with data quality and resources', 'Simplify data', 'Avoid country-specific data'], correctAnswer: 'Balance accuracy with data quality and resources' },
+          { id: 'en-39', lang: 'en', type: 'MCQ', question: 'Which is NOT considered a Scope 1 emission under IPCC for a refinery?', options: ['Combustion for process heat', 'Fugitive from pipelines', 'CO2 emissions from purchased electricity', 'Venting during maintenance'], correctAnswer: 'CO2 emissions from purchased electricity' },
+
           // --- PAGE 17: IPCC Cont. ---
-          {
-            id: 'en-23',
-            lang: 'en',
-            type: 'MCQ',
-            question: 'Which is NOT considered a Scope 1 emission under IPCC for a refinery?',
-            options: ['Combustion for process heat', 'Fugitive from pipelines', 'CO2 emissions from purchased electricity', 'Venting during maintenance'],
-            correctAnswer: 'CO2 emissions from purchased electricity' // Scope 2
-          },
-          {
-            id: 'en-24',
-            lang: 'en',
-            type: 'MCQ',
-            question: 'What is the default IPCC assumption about the oxidation factor for natural gas combustion?',
-            options: ['95%', '98%', '99%', '100%'],
-            correctAnswer: '100%'
-          },
-          {
-            id: 'en-25',
-            lang: 'en',
-            type: 'MCQ',
-            question: 'Why does the IPCC emphasize accounting for flaring efficiency?',
-            options: ['Eliminates methane', 'Inefficient flaring increases CO2', 'Inefficient flaring releases uncombusted methane', 'Promote energy recovery'],
-            correctAnswer: 'Inefficient flaring releases uncombusted methane'
-          },
+          { id: 'en-40', lang: 'en', type: 'MCQ', question: 'When estimating methane emissions from natural gas operations, what parameter is critical for Tier 2 methods?', options: ['GWP', 'Country-specific leakage rates', 'Carbon content', 'Equipment age'], correctAnswer: 'Country-specific leakage rates' },
+          { id: 'en-41', lang: 'en', type: 'MCQ', question: 'What is the default IPCC assumption about the oxidation factor for natural gas combustion?', options: ['95%', '98%', '99%', '100%'], correctAnswer: '100%' },
+          { id: 'en-42', lang: 'en', type: 'MCQ', question: 'Which activity is a significant contributor to N2O emissions in the energy sector?', options: ['Gas flaring', 'Coal mining', 'Gasoline combustion in vehicles', 'Natural gas transmission'], correctAnswer: 'Gasoline combustion in vehicles' },
+          { id: 'en-43', lang: 'en', type: 'MCQ', question: 'How is the carbon content of crude oil typically determined in IPCC reporting?', options: ['Laboratory testing', 'Default factors', 'Manufacturer specs', 'Sulfur content'], correctAnswer: 'Laboratory testing' },
+          { id: 'en-44', lang: 'en', type: 'MCQ', question: 'Why are CO2 emissions from combustion of refinery off-gases usually categorized separately?', options: ['Non-combustion', 'Biogenic', 'By-product of on-site processes', 'Not contributing'], correctAnswer: 'By-product of on-site processes' },
+          { id: 'en-45', lang: 'en', type: 'MCQ', question: 'Why does the IPCC emphasize accounting for flaring efficiency?', options: ['Eliminates methane', 'Inefficient flaring increases CO2', 'Inefficient flaring releases uncombusted methane', 'Promote energy recovery'], correctAnswer: 'Inefficient flaring releases uncombusted methane' },
+          { id: 'en-46', lang: 'en', type: 'MCQ', question: 'Which factor is critical for estimating GHG emissions from underground coal mining?', options: ['Depth', 'Methane content of the coal seam', 'Heat content', 'Volume'], correctAnswer: 'Methane content of the coal seam' },
+
           // --- PAGE 18: IPCC T/F & CBAM ---
-          {
-            id: 'en-tf-10',
-            lang: 'en',
-            type: 'TF',
-            question: 'The IPCC directly conducts research and collects climate data from monitoring stations.',
-            options: ['True', 'False'],
-            correctAnswer: 'False' // It assesses research, doesn't conduct it
-          },
-          {
-            id: 'en-tf-11',
-            lang: 'en',
-            type: 'TF',
-            question: 'The IPCC is responsible for providing scientific reports on climate change to policymakers.',
-            options: ['True', 'False'],
-            correctAnswer: 'True'
-          },
-          {
-            id: 'en-26',
-            lang: 'en',
-            type: 'MCQ',
-            question: 'CBAM: CO2 emission calculations under CBAM account for steam inputs as part of:',
-            options: ['Scope 1', 'Scope 2', 'Not accounted for'],
-            correctAnswer: 'Scope 2' // Imported heat/steam is usually indirect
-          },
-          {
-            id: 'en-27',
-            lang: 'en',
-            type: 'MCQ',
-            question: 'If exported goods have embedded emissions higher than the free allowance:',
-            options: ['Penalties are imposed', 'CBAM certificates are bought from EU market', 'Certificates bought from Egyptian market'],
-            correctAnswer: 'CBAM certificates are bought from EU market'
-          },
-          // --- PAGE 19: CBAM T/F & ISO 14064-3 ---
-          {
-            id: 'en-tf-12',
-            lang: 'en',
-            type: 'TF',
-            question: 'Methane pyrolysis has a lower C footprint than Steam Methane Reforming.',
-            options: ['True', 'False'],
-            correctAnswer: 'True'
-          },
-          {
-            id: 'en-tf-13',
-            lang: 'en',
-            type: 'TF',
-            question: 'Green hydrogen is produced from water hydrolysis using grid electricity.',
-            options: ['True', 'False'],
-            correctAnswer: 'False' // Renewable electricity, not grid (unless grid is green)
-          },
-          {
-            id: 'en-28',
-            lang: 'en',
-            type: 'MCQ',
-            question: 'What is the primary objective of ISO 14064-3?',
-            options: ['Guidelines for quantification', 'Establish requirements for verification and validation', 'Certify inventories', 'Develop reduction projects'],
-            correctAnswer: 'Establish requirements for verification and validation'
-          },
-          // --- PAGE 20: ISO 14064-3 ---
-          {
-            id: 'en-29',
-            lang: 'en',
-            type: 'MCQ',
-            question: 'ISO 14064-3: What does the term "materiality" refer to?',
-            options: ['The threshold for significance of errors or omissions', 'Physical form of data', 'Type of inventory', 'Scope of assertion'],
-            correctAnswer: 'The threshold for significance of errors or omissions'
-          },
-          {
-            id: 'en-30',
-            lang: 'en',
-            type: 'MCQ',
-            question: 'Which is NOT a responsibility of the verifier under ISO 14064-3?',
-            options: ['Reviewing accuracy', 'Providing independent opinion', 'Assessing risk', 'Assisting the organization in preparing the GHG inventory'],
-            correctAnswer: 'Assisting the organization in preparing the GHG inventory' // Conflict of interest
-          },
-          {
-            id: 'en-31',
-            lang: 'en',
-            type: 'MCQ',
-            question: 'What is a key factor in determining the level of assurance?',
-            options: ['Size of team', 'Intended use of the GHG assertion', 'Duration of reporting', 'Type of protocol'],
-            correctAnswer: 'Intended use of the GHG assertion'
-          },
-          {
-            id: 'en-32',
-            lang: 'en',
-            type: 'MCQ',
-            question: 'What must a verifier provide at the conclusion of a verification process?',
-            options: ['Inventory report', 'Corrective action plan', 'Validation opinion', 'Assurance statement'],
-            correctAnswer: 'Assurance statement' // or Validation opinion, usually "Assurance statement" or "Verification opinion"
-          },
-          {
-            id: 'en-33',
-            lang: 'en',
-            type: 'MCQ',
-            question: 'Why is independence important for a verifier in ISO 14064-3?',
-            options: ['Compliance with regulations', 'Streamline process', 'Avoid conflicts of interest and ensure impartiality', 'Minimize evidence'],
-            correctAnswer: 'Avoid conflicts of interest and ensure impartiality'
-          },
+          { id: 'en-tf-34', lang: 'en', type: 'TF', question: 'The IPCC directly conducts research and collects climate data from monitoring stations.', options: ['True', 'False'], correctAnswer: 'False' },
+          { id: 'en-tf-35', lang: 'en', type: 'TF', question: 'The IPCC is responsible for providing scientific reports on climate change to policymakers.', options: ['True', 'False'], correctAnswer: 'True' },
+          { id: 'en-tf-36', lang: 'en', type: 'TF', question: 'IPCC assessment reports are released annually.', options: ['True', 'False'], correctAnswer: 'False' },
+          { id: 'en-tf-37', lang: 'en', type: 'TF', question: 'The IPCC develops methodologies for calculating greenhouse gas (GHG) emissions.', options: ['True', 'False'], correctAnswer: 'True' },
+          { id: 'en-tf-38', lang: 'en', type: 'TF', question: 'The IPCC operates under the United Nations.', options: ['True', 'False'], correctAnswer: 'True' },
+          { id: 'en-tf-39', lang: 'en', type: 'TF', question: 'The IPCC provides policy recommendations for countries to adopt.', options: ['True', 'False'], correctAnswer: 'False' },
+          { id: 'en-tf-40', lang: 'en', type: 'TF', question: 'The IPCC\'s Working Group I focuses on the physical science basis of climate change.', options: ['True', 'False'], correctAnswer: 'True' },
+          { id: 'en-tf-41', lang: 'en', type: 'TF', question: 'The IPCC\'s methodologies are mandatory for all countries to use when reporting GHG emissions.', options: ['True', 'False'], correctAnswer: 'False' },
+          { id: 'en-tf-42', lang: 'en', type: 'TF', question: 'The IPCC provides global temperature projections based on different emissions scenarios.', options: ['True', 'False'], correctAnswer: 'True' },
+          { id: 'en-tf-43', lang: 'en', type: 'TF', question: 'The IPCC reports are authored only by scientists from developed countries.', options: ['True', 'False'], correctAnswer: 'False' },
+
+          { id: 'en-47', lang: 'en', type: 'MCQ', question: 'CBAM: CO2 emission calculations under CBAM account for steam inputs as part of:', options: ['Scope 1', 'Scope 2', 'Not accounted for'], correctAnswer: 'Scope 2' },
+          { id: 'en-48', lang: 'en', type: 'MCQ', question: 'A cement company is reporting cement embedded CO2 emissions under CBAM, which is taken into consideration?', options: ['Clinker', 'Limestone', 'None'], correctAnswer: 'Clinker' },
+          { id: 'en-49', lang: 'en', type: 'MCQ', question: 'A company has a carbon footprint of 1000 tCO2/y. Product 1 is 60% of price, P2 is 40%. If P1 is 50 t/y, embedded emissions in P1 are:', options: ['600', '12', '6'], correctAnswer: '12' },
+
+          // --- PAGE 19: CBAM Cont. ---
+          { id: 'en-50', lang: 'en', type: 'MCQ', question: 'Calculation of CO2 emissions from the flare of a petroleum refining company requires:', options: ['Volumetric flowrate', 'Composition', 'Both'], correctAnswer: 'Both' },
+          { id: 'en-51', lang: 'en', type: 'MCQ', question: 'If exported goods have embedded emissions higher than the free allowance:', options: ['Penalties are imposed', 'CBAM certificates are bought from EU market', 'Certificates bought from Egyptian market'], correctAnswer: 'CBAM certificates are bought from EU market' },
+
+          { id: 'en-tf-44', lang: 'en', type: 'TF', question: 'Methane pyrolysis has a lower C footprint than Steam Methane Reforming.', options: ['True', 'False'], correctAnswer: 'True' },
+          { id: 'en-tf-45', lang: 'en', type: 'TF', question: 'Catalytic methane pyrolysis does not generate CO2.', options: ['True', 'False'], correctAnswer: 'True' },
+          { id: 'en-tf-46', lang: 'en', type: 'TF', question: 'Green hydrogen is produced from water hydrolysis using grid electricity.', options: ['True', 'False'], correctAnswer: 'False' },
+          { id: 'en-tf-47', lang: 'en', type: 'TF', question: 'In a refinery, combustion emissions are due to fuel required for the main furnace only.', options: ['True', 'False'], correctAnswer: 'False' },
+          { id: 'en-tf-48', lang: 'en', type: 'TF', question: 'Fugitive emissions from storage tanks depend on the type of tank and material used.', options: ['True', 'False'], correctAnswer: 'True' },
+          { id: 'en-tf-49', lang: 'en', type: 'TF', question: 'Waste heat recovery for electricity production does not result in savings in CO2 emissions.', options: ['True', 'False'], correctAnswer: 'False' },
+          { id: 'en-tf-50', lang: 'en', type: 'TF', question: 'According to CBAM regulations penalties will be imposed if goods are imported by non-authorized CBAM declarant.', options: ['True', 'False'], correctAnswer: 'True' },
+
+          { id: 'en-52', lang: 'en', type: 'MCQ', question: 'What is the primary objective of ISO 14064-3?', options: ['Guidelines for quantification', 'Establish requirements for verification and validation', 'Certify inventories', 'Develop reduction projects'], correctAnswer: 'Establish requirements for verification and validation' },
+
+          // --- PAGE 20: ISO 14064-3 Cont. ---
+          { id: 'en-53', lang: 'en', type: 'MCQ', question: 'ISO 14064-3: What does the term "materiality" refer to?', options: ['Threshold for significance of errors', 'Physical form of data', 'Type of inventory', 'Scope of assertion'], correctAnswer: 'Threshold for significance of errors' },
+          { id: 'en-54', lang: 'en', type: 'MCQ', question: 'Which is NOT a responsibility of the verifier under ISO 14064-3?', options: ['Reviewing accuracy', 'Providing independent opinion', 'Assessing risk', 'Assisting in preparing the inventory'], correctAnswer: 'Assisting in preparing the inventory' },
+          { id: 'en-55', lang: 'en', type: 'MCQ', question: 'What is a key factor in determining the level of assurance?', options: ['Size of team', 'Intended use of the GHG assertion', 'Duration of reporting', 'Type of protocol'], correctAnswer: 'Intended use of the GHG assertion' },
+          { id: 'en-56', lang: 'en', type: 'MCQ', question: 'Which is a key requirement for validation under ISO 14064-3?', options: ['Ensuring no discrepancies', 'Conducting site visit', 'Confirming plausibility of assumptions', 'Creating inventory'], correctAnswer: 'Confirming plausibility of assumptions' },
+          { id: 'en-57', lang: 'en', type: 'MCQ', question: 'Which type of evidence is considered most reliable for verification?', options: ['Data verified by external third parties', 'Verbal statements', 'Internal estimates', 'Assumptions'], correctAnswer: 'Data verified by external third parties' },
+          { id: 'en-58', lang: 'en', type: 'MCQ', question: 'What is the purpose of a verification plan?', options: ['Outline reduction strategy', 'Detail verifier approach', 'Certify inventory', 'Calculate factors'], correctAnswer: 'Detail verifier approach' },
+          { id: 'en-59', lang: 'en', type: 'MCQ', question: 'What is a common tool for assessing the likelihood of material discrepancies?', options: ['Sensitivity analysis', 'Factor databases', 'Calculator', 'Risk-based sampling'], correctAnswer: 'Risk-based sampling' },
+          { id: 'en-60', lang: 'en', type: 'MCQ', question: 'What must a verifier provide at the conclusion of a verification process?', options: ['Inventory report', 'Corrective action plan', 'Validation opinion', 'Assurance statement'], correctAnswer: 'Assurance statement' },
+          { id: 'en-61', lang: 'en', type: 'MCQ', question: 'Why is independence important for a verifier?', options: ['Compliance', 'Streamline', 'Avoid conflicts of interest and ensure impartiality', 'Minimize evidence'], correctAnswer: 'Avoid conflicts of interest and ensure impartiality' },
+
           // --- PAGE 21: ISO 14064-3 T/F ---
-          {
-            id: 'en-tf-14',
-            lang: 'en',
-            type: 'TF',
-            question: 'The verifier must be part of the team preparing GHG data to ensure accuracy.',
-            options: ['True', 'False'],
-            correctAnswer: 'False'
-          },
-          {
-            id: 'en-tf-15',
-            lang: 'en',
-            type: 'TF',
-            question: 'ISO 14064-3 focuses on ensuring the credibility of GHG data through verification and validation processes.',
-            options: ['True', 'False'],
-            correctAnswer: 'True'
-          },
-          {
-            id: 'en-tf-16',
-            lang: 'en',
-            type: 'TF',
-            question: 'The verifier can provide consulting services on emissions reductions during the verification process.',
-            options: ['True', 'False'],
-            correctAnswer: 'False'
-          },
-          {
-            id: 'en-tf-17',
-            lang: 'en',
-            type: 'TF',
-            question: 'Validation includes reviewing data related to emission sources and GHG sinks.',
-            options: ['True', 'False'],
-            correctAnswer: 'True'
-          }
+          { id: 'en-tf-51', lang: 'en', type: 'TF', question: 'The verifier must be part of the team preparing GHG data to ensure accuracy.', options: ['True', 'False'], correctAnswer: 'False' },
+          { id: 'en-tf-52', lang: 'en', type: 'TF', question: 'ISO 14064-3 focuses on ensuring the credibility of GHG data through verification and validation processes.', options: ['True', 'False'], correctAnswer: 'True' },
+          { id: 'en-tf-53', lang: 'en', type: 'TF', question: 'The verifier can provide consulting services on emissions reductions during the verification process.', options: ['True', 'False'], correctAnswer: 'False' },
+          { id: 'en-tf-54', lang: 'en', type: 'TF', question: 'The verification process includes reviewing assumptions and methodologies used in preparing GHG data.', options: ['True', 'False'], correctAnswer: 'True' },
+          { id: 'en-tf-55', lang: 'en', type: 'TF', question: 'ISO 14064-3 can only be applied to large industrial organizations.', options: ['True', 'False'], correctAnswer: 'False' },
+          { id: 'en-tf-56', lang: 'en', type: 'TF', question: 'The verifier must document any material discrepancies identified during the verification process.', options: ['True', 'False'], correctAnswer: 'True' },
+          { id: 'en-tf-57', lang: 'en', type: 'TF', question: 'The verifier must review GHG data for all previous years of the company.', options: ['True', 'False'], correctAnswer: 'False' },
+          { id: 'en-tf-58', lang: 'en', type: 'TF', question: 'The primary output of the verification process is a report that confirms the validity of the GHG declarations.', options: ['True', 'False'], correctAnswer: 'True' },
+          { id: 'en-tf-59', lang: 'en', type: 'TF', question: 'The verifier can modify GHG data during the verification process.', options: ['True', 'False'], correctAnswer: 'False' },
+          { id: 'en-tf-60', lang: 'en', type: 'TF', question: 'Validation includes reviewing data related to emission sources and GHG sinks.', options: ['True', 'False'], correctAnswer: 'True' }
         ];
+
 
         // ----------------------------------------------------------------------
         // UTILS
@@ -823,23 +343,33 @@
           const [gameState, setGameState] = useState('welcome'); // welcome, quiz, result
           const [quizQuestions, setQuizQuestions] = useState([]);
           const [currentQIndex, setCurrentQIndex] = useState(0);
-          const [userAnswers, setUserAnswers] = useState({}); // { qId: { selected: string, isCorrect: bool } }
-          const [timeLeft, setTimeLeft] = useState(90 * 60); // 90 minutes in seconds
+          const [userAnswers, setUserAnswers] = useState({}); 
+          const [timeLeft, setTimeLeft] = useState(0);
+          const [currentMode, setCurrentMode] = useState('standard'); // 'standard' or 'full'
 
           // Initialize Quiz
-          const startQuiz = () => {
-            const shuffled = shuffleArray(RAW_QUESTIONS);
-            // Simulate 80 questions by duplicating if list is short
-            let pool = [...shuffled];
-            while (pool.length < 80) {
-                pool = [...pool, ...shuffled];
+          const startQuiz = (mode) => {
+            setCurrentMode(mode);
+            let selected = [];
+            let duration = 0;
+
+            if (mode === 'standard') {
+                // 80 Questions, 90 Minutes
+                selected = shuffleArray(RAW_QUESTIONS).slice(0, 80);
+                duration = 90 * 60; 
+            } else {
+                // Full Bank, ~4 Hours (240 mins) to be safe for 180 questions
+                selected = shuffleArray(RAW_QUESTIONS);
+                duration = 240 * 60; 
             }
-            const selected = pool.slice(0, 80).map((q, idx) => ({ ...q, tempId: `${q.id}-${idx}` })); 
+
+            // Map to tempIds to ensure uniqueness if we ever did duplicates (not needed now but safe)
+            const finalQuestions = selected.map((q, idx) => ({ ...q, tempId: `${q.id}-${idx}` }));
             
-            setQuizQuestions(selected);
+            setQuizQuestions(finalQuestions);
             setCurrentQIndex(0);
             setUserAnswers({});
-            setTimeLeft(90 * 60);
+            setTimeLeft(duration);
             setGameState('quiz');
           };
 
@@ -886,7 +416,7 @@
           const calculateScore = () => {
             const total = quizQuestions.length;
             const correct = Object.values(userAnswers).filter(a => a.isCorrect).length;
-            const percentage = (correct / total) * 100;
+            const percentage = total > 0 ? (correct / total) * 100 : 0;
             return { correct, total, percentage };
           };
 
@@ -905,7 +435,8 @@
                       alt="EPROM Logo" 
                       className="h-10 w-auto bg-white rounded p-1 object-contain" 
                     />
-                    <h1 className="text-xl font-bold">Carbon Footprint Exam</h1>
+                    <h1 className="text-xl font-bold hidden md:block">Carbon Footprint Exam</h1>
+                    <h1 className="text-lg font-bold md:hidden">Exam</h1>
                   </div>
                   {gameState === 'quiz' && (
                     <div className={`flex items-center space-x-2 font-mono text-xl ${timeLeft < 300 ? 'text-red-300 animate-pulse' : ''}`}>
@@ -934,42 +465,43 @@
                       Carbon Footprint & ISO Standards Quiz
                     </p>
                     
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-left rtl:text-right bg-gray-50 p-6 rounded-lg border border-gray-200">
-                      <div className="flex items-center space-x-3 rtl:space-x-reverse">
-                        <div className="bg-blue-100 p-2 rounded-lg text-blue-600 font-bold">80</div>
-                        <div>
-                          <p className="font-semibold">Questions</p>
-                          <p className="text-xs text-gray-500">Randomized</p>
-                        </div>
-                      </div>
-                      <div className="flex items-center space-x-3 rtl:space-x-reverse">
-                        <div className="bg-orange-100 p-2 rounded-lg text-orange-600 font-bold">90</div>
-                        <div>
-                          <p className="font-semibold">Minutes</p>
-                          <p className="text-xs text-gray-500">Duration</p>
-                        </div>
-                      </div>
-                      <div className="flex items-center space-x-3 rtl:space-x-reverse">
-                        <div className="bg-green-100 p-2 rounded-lg text-green-600 font-bold">70%</div>
-                        <div>
-                          <p className="font-semibold">Pass Score</p>
-                          <p className="text-xs text-gray-500">Required</p>
-                        </div>
-                      </div>
+                    <div className="bg-blue-50 p-4 rounded-lg border border-blue-200 mb-6 text-sm text-blue-800">
+                      <strong>Choose your exam mode:</strong>
                     </div>
 
-                    <ul className="text-sm text-gray-500 space-y-2 text-left rtl:text-right">
-                      <li>• Questions cover ISO 14064, 14001, 50001, GHG Protocol, IPCC, and LCA.</li>
-                      <li>• Immediate feedback: Green for Correct, Red for Incorrect.</li>
-                      <li>• Bilingual: Questions appear in their original language (Arabic/English).</li>
-                    </ul>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {/* Option 1: Standard */}
+                        <button 
+                          onClick={() => startQuiz('standard')}
+                          className="flex flex-col items-center justify-center p-6 bg-white border-2 border-emerald-500 rounded-xl hover:bg-emerald-50 transition shadow-sm group"
+                        >
+                            <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mb-4 text-emerald-600 group-hover:scale-110 transition">
+                                <Clock className="w-8 h-8" />
+                            </div>
+                            <h3 className="text-xl font-bold text-gray-800 mb-2">Standard Exam</h3>
+                            <p className="text-sm text-gray-500">80 Random Questions</p>
+                            <p className="text-sm text-gray-500">90 Minutes</p>
+                            <p className="text-sm font-bold text-emerald-600 mt-2">Pass: 70%</p>
+                        </button>
 
-                    <button 
-                      onClick={startQuiz}
-                      className="w-full py-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-bold text-xl transition shadow-lg flex items-center justify-center space-x-2"
-                    >
-                      <span>Start Exam / ابدأ الاختبار</span>
-                    </button>
+                        {/* Option 2: Full Bank */}
+                        <button 
+                          onClick={() => startQuiz('full')}
+                          className="flex flex-col items-center justify-center p-6 bg-white border-2 border-blue-500 rounded-xl hover:bg-blue-50 transition shadow-sm group"
+                        >
+                            <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-4 text-blue-600 group-hover:scale-110 transition">
+                                <Layers className="w-8 h-8" />
+                            </div>
+                            <h3 className="text-xl font-bold text-gray-800 mb-2">Full Question Bank</h3>
+                            <p className="text-sm text-gray-500">All Available Questions</p>
+                            <p className="text-sm text-gray-500">4 Hours Timer</p>
+                            <p className="text-sm font-bold text-blue-600 mt-2">Practice Mode</p>
+                        </button>
+                    </div>
+
+                    <div className="mt-8 text-xs text-gray-400">
+                      v2.0 • Contains 180+ Questions covering all ISO standards
+                    </div>
                   </div>
                 )}
 
@@ -979,7 +511,7 @@
                     {/* Progress Bar */}
                     <div className="w-full bg-gray-200 rounded-full h-2.5">
                       <div 
-                        className="bg-emerald-600 h-2.5 rounded-full transition-all duration-300" 
+                        className={`h-2.5 rounded-full transition-all duration-300 ${currentMode === 'full' ? 'bg-blue-600' : 'bg-emerald-600'}`}
                         style={{ width: `${((currentQIndex + 1) / quizQuestions.length) * 100}%` }}
                       ></div>
                     </div>
@@ -1051,14 +583,14 @@
                       {currentQIndex === quizQuestions.length - 1 ? (
                         <button 
                           onClick={finishQuiz}
-                          className="px-8 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-bold shadow-md transition"
+                          className={`px-8 py-3 text-white rounded-lg font-bold shadow-md transition ${currentMode === 'full' ? 'bg-blue-600 hover:bg-blue-700' : 'bg-emerald-600 hover:bg-emerald-700'}`}
                         >
                           Submit Exam
                         </button>
                       ) : (
                         <button 
                           onClick={nextQuestion}
-                          className="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold shadow-md transition"
+                          className="px-8 py-3 bg-gray-800 hover:bg-gray-900 text-white rounded-lg font-bold shadow-md transition"
                         >
                           Next Question
                         </button>
@@ -1072,7 +604,9 @@
                   <div className="bg-white rounded-xl shadow-lg p-8 text-center space-y-8 animate-fade-in">
                     <div className="space-y-2">
                       <h2 className="text-3xl font-bold text-gray-800">Exam Completed</h2>
-                      <p className="text-gray-500">Here is your performance report</p>
+                      <p className="text-gray-500">
+                        {currentMode === 'full' ? 'Practice Session Report' : 'Standard Exam Report'}
+                      </p>
                     </div>
 
                     {(() => {
@@ -1106,11 +640,11 @@
                           </div>
 
                           <button 
-                            onClick={startQuiz}
+                            onClick={() => setGameState('welcome')}
                             className="w-full md:w-auto px-10 py-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-bold text-lg shadow-lg flex items-center justify-center space-x-2 mx-auto transition"
                           >
                             <RefreshCw className="w-5 h-5" />
-                            <span>Retest (New Questions)</span>
+                            <span>Return to Home</span>
                           </button>
                         </div>
                       );
